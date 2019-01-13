@@ -5,9 +5,9 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{3EAF01E5-41F9-49CA-8AE7-38D1761DB44D}</ProjectGuid>
-    <OutputType>Exe</OutputType>
-    <RootNamespace>CertificateGenerator</RootNamespace>
-    <AssemblyName>CertificateGenerator</AssemblyName>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Nightwolf.Certificates</RootNamespace>
+    <AssemblyName>Nightwolf.Certificates.Generator</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -30,6 +30,9 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
