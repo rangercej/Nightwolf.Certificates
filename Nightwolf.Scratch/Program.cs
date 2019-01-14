@@ -18,6 +18,7 @@
             gen.AddSubjectAltName("E=bob@example.org");
             gen.AddExtendedUsage(ExtendedKeyUses.ClientAuth);
             gen.AddExtendedUsage(ExtendedKeyUses.SmartcardLogin);
+            gen.AddCustomStringValue(new Oid("1.2.3.4.5.6.7.8.9.10"), DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
             var cert = gen.Generate();
             var bytes = cert.Export(X509ContentType.Pfx, string.Empty);
             System.IO.File.WriteAllBytes("cert_ec.pfx", bytes);

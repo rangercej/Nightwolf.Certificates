@@ -5,6 +5,7 @@
     using System.Net;
     using System.Security.Cryptography;
     using System.Security.Cryptography.X509Certificates;
+    using System.Text;
 
     /// <summary>
     ///  Certificate generator
@@ -158,9 +159,23 @@
                 throw new ArgumentException("Comment already set");
             }
 
-            // var str = comment.To
-            // var extension = new X509Extension(oid, Encoding.UTF8.GetBytes(comment), false);
-            // this.certReq.CertificateExtensions.Add(extension);
+            var extension = new X509Extension(oid, comment.ToAsn1String(), false);
+            this.certReq.CertificateExtensions.Add(extension);
+        }
+
+        /// <summary>
+        /// Add a custom string extension
+        /// </summary>
+        /// <param name="comment">Comment text</param>
+        public void AddCustomStringValue(Oid oid, string comment)
+        {
+            if (this.certReq.CertificateExtensions.Count(x => x.Oid.Value == oid.Value) != 0)
+            {
+                throw new ArgumentException("Extension already added");
+            }
+
+            var extension = new X509Extension(oid, comment.ToAsn1String(), false);
+            this.certReq.CertificateExtensions.Add(extension);
         }
 
         /// <summary>
