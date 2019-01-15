@@ -159,7 +159,7 @@
                 throw new ArgumentException("Comment already set");
             }
 
-            var extension = new X509Extension(oid, comment.ToAsn1String(), false);
+            var extension = new X509Extension(oid, comment.ToAsn1(), false);
             this.certReq.CertificateExtensions.Add(extension);
         }
 
@@ -167,14 +167,44 @@
         /// Add a custom string extension
         /// </summary>
         /// <param name="comment">Comment text</param>
-        public void AddCustomStringValue(Oid oid, string comment)
+        public void AddCustomValue(Oid oid, string comment)
         {
             if (this.certReq.CertificateExtensions.Count(x => x.Oid.Value == oid.Value) != 0)
             {
                 throw new ArgumentException("Extension already added");
             }
 
-            var extension = new X509Extension(oid, comment.ToAsn1String(), false);
+            var extension = new X509Extension(oid, comment.ToAsn1(), false);
+            this.certReq.CertificateExtensions.Add(extension);
+        }
+
+        /// <summary>
+        /// Add a custom int extension
+        /// </summary>
+        /// <param name="val">Value to include</param>
+        public void AddCustomValue(Oid oid, int val)
+        {
+            if (this.certReq.CertificateExtensions.Count(x => x.Oid.Value == oid.Value) != 0)
+            {
+                throw new ArgumentException("Extension already added");
+            }
+
+            var extension = new X509Extension(oid, val.ToAsn1(), false);
+            this.certReq.CertificateExtensions.Add(extension);
+        }
+
+        /// <summary>
+        /// Add a custom boolean extension
+        /// </summary>
+        /// <param name="val">Value to include</param>
+        public void AddCustomValue(Oid oid, bool val)
+        {
+            if (this.certReq.CertificateExtensions.Count(x => x.Oid.Value == oid.Value) != 0)
+            {
+                throw new ArgumentException("Extension already added");
+            }
+
+            var extension = new X509Extension(oid, val.ToAsn1(), false);
             this.certReq.CertificateExtensions.Add(extension);
         }
 
