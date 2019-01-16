@@ -15,6 +15,12 @@
         /// <summary>Certificate builder</summary>
         private readonly CertificateRequest certReq;
 
+        /// <summary>Extended key uses</summary>
+        private readonly OidCollection extendedUses = new OidCollection();
+
+        /// <summary>Random number generator</summary>
+        private readonly RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
+
         /// <summary>Certificate start date and time</summary>
         private DateTime? startDateTime;
 
@@ -23,9 +29,6 @@
 
         /// <summary>Certificate alternate names</summary>
         private SubjectAlternativeNameBuilder sanBuilder;
-
-        /// <summary>Extended key uses</summary>
-        private readonly OidCollection extendedUses = new OidCollection();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Generator"/> class with default parameters.
@@ -46,7 +49,6 @@
         {
             var key = GenerateEcKey(curve);
             this.certReq = new CertificateRequest(subject, key, hash);
-            this.AddSubjectAltName(subject);
         }
 
         /// <summary>
@@ -59,7 +61,6 @@
         {
             var key = GenerateRsaKey(size);
             this.certReq = new CertificateRequest(subject, key, hash, RSASignaturePadding.Pkcs1);
-            this.AddSubjectAltName(subject);
         }
 
         /// <summary>
@@ -166,6 +167,7 @@
         /// <summary>
         /// Add a custom string extension
         /// </summary>
+        /// <param name="oid">OID for extension</param>
         /// <param name="comment">Comment text</param>
         public void AddCustomValue(Oid oid, string comment)
         {
@@ -181,6 +183,7 @@
         /// <summary>
         /// Add a custom int extension
         /// </summary>
+        /// <param name="oid">OID for extension</param>
         /// <param name="val">Value to include</param>
         public void AddCustomValue(Oid oid, int val)
         {
@@ -196,6 +199,7 @@
         /// <summary>
         /// Add a custom boolean extension
         /// </summary>
+        /// <param name="oid">OID for extension</param>
         /// <param name="val">Value to include</param>
         public void AddCustomValue(Oid oid, bool val)
         {
@@ -240,8 +244,9 @@
         /// <summary>
         /// Generate the certificate
         /// </summary>
+        /// <param name="issuer">Issuing authority certificate</param>
         /// <returns>X509 certificate</returns>
-        public X509Certificate2 Generate()
+        public X509Certificate2 Generate(X509Certificate2 issuer = null)
         {
             if (this.startDateTime == null)
             {
@@ -259,7 +264,17 @@
                 this.certReq.CertificateExtensions.Add(new X509EnhancedKeyUsageExtension(this.extendedUses, false));
             }
 
-            var cert = this.certReq.CreateSelfSigned(this.startDateTime.Value, this.endDateTime.Value);
+            X509Certificate2 cert;
+            if (issuer == null)
+            {
+                cert = this.certReq.CreateSelfSigned(this.startDateTime.Value, this.endDateTime.Value);
+            }
+            else
+            {
+                var serialNumber = new byte[8];
+                this.rng.GetBytes(serialNumber);
+                cert = this.certReq.Create(issuer, this.startDateTime.Value, this.endDateTime.Value, serialNumber);
+            }
             return cert;
         }
     }

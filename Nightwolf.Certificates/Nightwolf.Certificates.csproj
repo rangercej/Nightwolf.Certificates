@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="Asn1.cs" />
     <Compile Include="ExtendedKeyUse.cs" />
+    <Compile Include="Factories.cs" />
     <Compile Include="Generator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
