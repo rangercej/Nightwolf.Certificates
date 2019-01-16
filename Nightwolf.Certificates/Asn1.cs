@@ -1,7 +1,6 @@
 ﻿namespace Nightwolf.Certificates
 {
-    using System;
-    using System.Net;
+    using System.Collections.Generic;
     using System.Text;
 
     /// <summary>
@@ -64,8 +63,8 @@
         internal static byte[] ToAsn1(this bool val)
         {
             return val 
-                ? new byte[] { (byte)Tag.Boolean, 1, 0xff } 
-                : new byte[] { (byte)Tag.Boolean, 1, 0x0 };
+                    ? ConstructAsn1Data(Tag.Boolean, 0xff) 
+                    : ConstructAsn1Data(Tag.Boolean, 0x0);
         }
 
         /// <summary>
@@ -84,20 +83,20 @@
 
             if (intAsUint <= 0xff)
             {
-                return new byte[] { (byte)Tag.Integer, 1, b0 };
+                return ConstructAsn1Data(Tag.Integer, b0);
             }
 
             if (intAsUint <= 0xffff)
             {
-                return new byte[] { (byte)Tag.Integer, 2, b1, b0 };
+                return ConstructAsn1Data(Tag.Integer, b1, b0);
             }
 
             if (intAsUint <= 0xffffff)
             {
-                return new byte[] { (byte)Tag.Integer, 3, b2, b1, b0 };
+                return ConstructAsn1Data(Tag.Integer, b2, b1, b0);
             }
 
-            return new byte[] { (byte)Tag.Integer, 4, b3, b2, b1, b0 };
+            return ConstructAsn1Data(Tag.Integer, b3, b2, b1, b0);
         }
 
         /// <summary>
@@ -114,24 +113,40 @@
 
             if (str.Length == 0)
             {
-                return new byte[] { (byte)Tag.Utf8String, 0 };
+                return ConstructAsn1Data(Tag.Utf8String, 0);
             }
 
             var charbytes = Encoding.UTF8.GetBytes(str);
-            var lenbytes = ConstructLength((uint)charbytes.Length);
-            byte[] asn1 = new byte[1 + lenbytes.Length + charbytes.Length];
+            return ConstructAsn1Data(Tag.Utf8String, charbytes);
+        }
 
-            asn1[0] = (byte)Tag.Utf8String;
-            lenbytes.CopyTo(asn1, 1);
-            charbytes.CopyTo(asn1, 1 + lenbytes.Length);
+        /// <summary>
+        /// Construct ASN.1 data
+        /// </summary>
+        /// <param name="tag">ASN.1 tag</param>
+        /// <param name="data">Data bytes</param>
+        /// <returns>ASN.1 byte array</returns>
+        private static byte[] ConstructAsn1Data(Tag tag, params byte[] data)
+        {
+            var bytes = new List<byte>(16);
+            var len = data != null ? (uint)data.Length : 0;
+            var lenbytes = ConstructLength(len);
 
-            return asn1;
+            bytes.Add((byte)tag);
+            bytes.AddRange(lenbytes);
+
+            if (data != null && len > 0)
+            {
+                bytes.AddRange(data);
+            }
+
+            return bytes.ToArray();
         }
 
         /// <summary>
         /// Construct an ASN.1 length specifier
         /// </summary>
-        /// <param name="len">Length</param>
+        /// <param name="len">Length to convert to ASN.1 bytes</param>
         /// <returns>ASN.1 length</returns>
         /// <remarks>X.690, section 8.1.3</remarks>
         private static byte[] ConstructLength(uint len)
