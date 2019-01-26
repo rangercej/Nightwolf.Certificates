@@ -1,4 +1,6 @@
-﻿namespace Nightwolf.Certificates
+﻿using Nightwolf.DerEncoder;
+
+namespace Nightwolf.Certificates
 {
     using System;
     using System.Linq;
@@ -148,19 +150,90 @@
         }
 
         /// <summary>
+        /// Create a certificate policy extension
+        /// </summary>
+        /// <param name="certPolicyStatement">Freetext brief policy statement</param>
+        /// <param name="certPolicyUrl">URL that points to full policy text</param>
+        /// <remarks>Defined in RFC 5280, section 4.2.1.4</remarks>
+        public void SetCertificatePolicy(string certPolicyStatement, Uri certPolicyUrl)
+        {
+            var idx = FindExtensionByOid(NamedOids.CertificatePolicy);
+            if (idx != -1)
+            {
+                this.certReq.CertificateExtensions.RemoveAt(idx);
+            }
+
+            DerSequence policyText = null;
+            DerSequence policyUrl = null;
+
+            if (!string.IsNullOrWhiteSpace(certPolicyStatement))
+            {
+                policyText = new DerSequence(
+                    new DerOid(NamedOids.PolicyQualifierIdUnotice),
+                    new DerSequence(
+                        new DerUtf8String(certPolicyStatement)
+                    )
+                );
+            }
+
+            if (certPolicyUrl != null)
+            {
+                policyUrl = new DerSequence(
+                    new DerOid(NamedOids.PolicyQualifierIdCps),
+                    new DerIa5String(certPolicyUrl.AbsoluteUri)
+                );
+            }
+
+            DerSequence policyStatement = null;
+            if (policyUrl != null || policyText != null)
+            {
+                policyStatement = new DerSequence();
+                if (policyUrl != null)
+                {
+                    policyStatement.Add(policyUrl);
+                }
+
+                if (policyText != null)
+                {
+                    policyStatement.Add(policyText);
+                }
+            }
+
+            var policy = new DerSequence();
+            if (policyStatement == null)
+            {
+                policy.Add(new DerSequence(
+                        new DerOid(new Oid(NamedOids.CertificatePolicyAny))
+                    )
+                );
+            }
+            else
+            {
+                policy.Add(new DerSequence(
+                        new DerOid(new Oid(NamedOids.CertificatePolicyAny)),
+                        policyStatement
+                    )
+                );
+            }
+
+            this.SetExtension(new X509Extension(NamedOids.CertificatePolicy, policy.GetBytes(), false));
+        }
+
+        /// <summary>
         /// Set the nsComment extension text
         /// </summary>
         /// <param name="comment">Comment text</param>
         public void SetComment(string comment)
         {
             var oid = new Oid("2.16.840.1.113730.1.13");
-
-            if (this.certReq.CertificateExtensions.Count(x => x.Oid.Value == oid.Value) != 0)
+            var idx = FindExtensionByOid(oid);
+            if (idx != -1)
             {
-                throw new ArgumentException("Comment already set");
+                this.certReq.CertificateExtensions.RemoveAt(idx);
             }
 
-            var extension = new X509Extension(oid, comment.ToAsn1(), false);
+            var asnBytes = new Nightwolf.DerEncoder.DerUtf8String(comment).GetBytes();
+            var extension = new X509Extension(oid, asnBytes, false);
             this.certReq.CertificateExtensions.Add(extension);
         }
 
@@ -169,14 +242,16 @@
         /// </summary>
         /// <param name="oid">OID for extension</param>
         /// <param name="comment">Comment text</param>
-        public void AddCustomValue(Oid oid, string comment)
+        public void SetCustomValue(Oid oid, string comment)
         {
-            if (this.certReq.CertificateExtensions.Count(x => x.Oid.Value == oid.Value) != 0)
+            var idx = FindExtensionByOid(oid);
+            if (idx != -1)
             {
-                throw new ArgumentException("Extension already added");
+                this.certReq.CertificateExtensions.RemoveAt(idx);
             }
 
-            var extension = new X509Extension(oid, comment.ToAsn1(), false);
+            var asnBytes = new DerEncoder.DerUtf8String(comment).GetBytes();
+            var extension = new X509Extension(oid, asnBytes, false);
             this.certReq.CertificateExtensions.Add(extension);
         }
 
@@ -185,14 +260,16 @@
         /// </summary>
         /// <param name="oid">OID for extension</param>
         /// <param name="val">Value to include</param>
-        public void AddCustomValue(Oid oid, int val)
+        public void SetCustomValue(Oid oid, int val)
         {
-            if (this.certReq.CertificateExtensions.Count(x => x.Oid.Value == oid.Value) != 0)
+            var idx = FindExtensionByOid(oid);
+            if (idx != -1)
             {
-                throw new ArgumentException("Extension already added");
+                this.certReq.CertificateExtensions.RemoveAt(idx);
             }
 
-            var extension = new X509Extension(oid, val.ToAsn1(), false);
+            var asnBytes = new DerEncoder.DerInteger(val).GetBytes();
+            var extension = new X509Extension(oid, asnBytes, false);
             this.certReq.CertificateExtensions.Add(extension);
         }
 
@@ -201,26 +278,58 @@
         /// </summary>
         /// <param name="oid">OID for extension</param>
         /// <param name="val">Value to include</param>
-        public void AddCustomValue(Oid oid, bool val)
+        public void SetCustomValue(Oid oid, bool val)
         {
-            if (this.certReq.CertificateExtensions.Count(x => x.Oid.Value == oid.Value) != 0)
+            var idx = FindExtensionByOid(oid);
+            if (idx != -1)
             {
-                throw new ArgumentException("Extension already added");
+                this.certReq.CertificateExtensions.RemoveAt(idx);
             }
 
-            var extension = new X509Extension(oid, val.ToAsn1(), false);
+            var asnBytes = new DerEncoder.DerBoolean(val).GetBytes();
+            var extension = new X509Extension(oid, asnBytes, false);
             this.certReq.CertificateExtensions.Add(extension);
         }
 
         /// <summary>
         /// Set the appropriate parts for a CA authority
         /// </summary>
-        public void SetCertAsCa()
+        public void SetExtension(X509Extension extension)
         {
-            this.certReq.CertificateExtensions.Add(new X509BasicConstraintsExtension(true, false, 0, true));
-            var useFlags = X509KeyUsageFlags.CrlSign 
-                            | X509KeyUsageFlags.KeyCertSign
-                            | X509KeyUsageFlags.DigitalSignature;
+            var idx = this.FindExtensionByOid(extension.Oid);
+            if (idx != -1)
+            {
+                this.certReq.CertificateExtensions.RemoveAt(idx);
+            }
+
+            this.certReq.CertificateExtensions.Add(extension);
+        }
+
+        /// <summary>
+        /// Set the appropriate parts for a CA authority
+        /// </summary>
+        public void SetBasicConstraints(X509BasicConstraintsExtension constraints)
+        {
+            var idx = this.FindExtension<X509BasicConstraintsExtension>();
+            if (idx != -1)
+            {
+                this.certReq.CertificateExtensions.RemoveAt(idx);
+            }
+
+            this.certReq.CertificateExtensions.Add(constraints);
+        }
+
+        /// <summary>
+        /// Set the appropriate parts for a CA authority
+        /// </summary>
+        public void SetKeyUsage(X509KeyUsageFlags useFlags)
+        {
+            var idx = this.FindExtension<X509KeyUsageExtension>();
+            if (idx != -1)
+            {
+                this.certReq.CertificateExtensions.RemoveAt(idx);
+            }
+
             this.certReq.CertificateExtensions.Add(new X509KeyUsageExtension(useFlags, true));
         }
 
@@ -258,7 +367,11 @@
                 throw new ArgumentNullException(nameof(this.endDateTime));
             }
 
-            this.certReq.CertificateExtensions.Add(this.sanBuilder.Build());
+            if (this.sanBuilder != null)
+            {
+                this.certReq.CertificateExtensions.Add(this.sanBuilder.Build());
+            }
+
             if (this.extendedUses.Count > 0)
             {
                 this.certReq.CertificateExtensions.Add(new X509EnhancedKeyUsageExtension(this.extendedUses, false));
@@ -276,6 +389,54 @@
                 cert = this.certReq.Create(issuer, this.startDateTime.Value, this.endDateTime.Value, serialNumber);
             }
             return cert;
+        }
+
+        /// <summary>
+        /// Search for an extension in the certificate
+        /// </summary>
+        /// <typeparam name="T">Type of extension to search for</typeparam>
+        /// <returns>Index of first occurance of extension</returns>
+        private int FindExtension<T>()
+        {
+            for (var i = 0; i < this.certReq.CertificateExtensions.Count; i++)
+            {
+                var ext = this.certReq.CertificateExtensions[i];
+                if (ext is T)
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        /// <summary>
+        /// Search for an extension in the certificate
+        /// </summary>
+        /// <param name="oid">OID to look for</param>
+        /// <returns>Index of first occurance of extension with OID</returns>
+        private int FindExtensionByOid(string oid)
+        {
+            for (var i = 0; i < this.certReq.CertificateExtensions.Count; i++)
+            {
+                var ext = this.certReq.CertificateExtensions[i];
+                if (ext.Oid.Value == oid)
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        /// <summary>
+        /// Search for an extension in the certificate
+        /// </summary>
+        /// <param name="oid">OID to look for</param>
+        /// <returns>Index of first occurance of extension with OID</returns>
+        private int FindExtensionByOid(Oid oid)
+        {
+            return FindExtensionByOid(oid.Value);
         }
     }
 }

@@ -45,14 +45,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Asn1.cs" />
     <Compile Include="ExtendedKeyUse.cs" />
     <Compile Include="Factories.cs" />
     <Compile Include="Generator.cs" />
+    <Compile Include="NamedOids.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <ProjectReference Include="..\Nightwolf.DerEncoder\Nightwolf.DerEncoder.csproj">
+      <Project>{55c7518e-34f6-49ba-a63b-325ffe3c0a5a}</Project>
+      <Name>Nightwolf.DerEncoder</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

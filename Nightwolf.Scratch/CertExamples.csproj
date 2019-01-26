@@ -49,6 +49,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Nightwolf.DerEncoder\Nightwolf.DerEncoder.csproj">
+      <Project>{55c7518e-34f6-49ba-a63b-325ffe3c0a5a}</Project>
+      <Name>Nightwolf.DerEncoder</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Nightwolf.Certificates\Nightwolf.Certificates.csproj">
       <Project>{3eaf01e5-41f9-49ca-8ae7-38d1761db44d}</Project>
       <Name>Nightwolf.Certificates</Name>
