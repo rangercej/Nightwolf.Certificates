@@ -17,5 +17,7 @@ namespace Nightwolf.Certificates
         public static Oid PolicyQualifierId = new Oid(ArcIdPkix.Value + ".2");
         public static Oid PolicyQualifierIdCps = new Oid(PolicyQualifierId.Value + ".1");
         public static Oid PolicyQualifierIdUnotice = new Oid(PolicyQualifierId.Value + ".2");
+        
+        public static Oid NsComment = new Oid("2.16.840.1.113730.1.13");
     }
 }

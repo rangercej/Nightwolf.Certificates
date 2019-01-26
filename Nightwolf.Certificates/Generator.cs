@@ -3,11 +3,9 @@
 namespace Nightwolf.Certificates
 {
     using System;
-    using System.Linq;
     using System.Net;
     using System.Security.Cryptography;
     using System.Security.Cryptography.X509Certificates;
-    using System.Text;
 
     /// <summary>
     ///  Certificate generator
@@ -203,14 +201,14 @@ namespace Nightwolf.Certificates
             if (policyStatement == null)
             {
                 policy.Add(new DerSequence(
-                        new DerOid(new Oid(NamedOids.CertificatePolicyAny))
+                        new DerOid(NamedOids.CertificatePolicyAny)
                     )
                 );
             }
             else
             {
                 policy.Add(new DerSequence(
-                        new DerOid(new Oid(NamedOids.CertificatePolicyAny)),
+                        new DerOid(NamedOids.CertificatePolicyAny),
                         policyStatement
                     )
                 );
@@ -225,15 +223,14 @@ namespace Nightwolf.Certificates
         /// <param name="comment">Comment text</param>
         public void SetComment(string comment)
         {
-            var oid = new Oid("2.16.840.1.113730.1.13");
-            var idx = FindExtensionByOid(oid);
+            var idx = FindExtensionByOid(NamedOids.NsComment);
             if (idx != -1)
             {
                 this.certReq.CertificateExtensions.RemoveAt(idx);
             }
 
             var asnBytes = new Nightwolf.DerEncoder.DerUtf8String(comment).GetBytes();
-            var extension = new X509Extension(oid, asnBytes, false);
+            var extension = new X509Extension(NamedOids.NsComment, asnBytes, false);
             this.certReq.CertificateExtensions.Add(extension);
         }
 
