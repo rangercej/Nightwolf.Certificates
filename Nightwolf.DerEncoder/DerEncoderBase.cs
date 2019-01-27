@@ -74,19 +74,7 @@
         /// <returns>ASN.1 byte array</returns>
         protected static byte[] BuildPrimitiveAsn1Data(Tag tag, params byte[] data)
         {
-            var bytes = new List<byte>(16);
-            var len = data != null ? (uint)data.Length : 0;
-            var lenbytes = ConstructLength(len);
-
-            bytes.Add((byte)tag);
-            bytes.AddRange(lenbytes);
-
-            if (data != null && len > 0)
-            {
-                bytes.AddRange(data);
-            }
-
-            return bytes.ToArray();
+            return BuildInternalDerData(tag, data, false);
         }
 
         /// <summary>
@@ -95,13 +83,45 @@
         /// <param name="tag">ASN.1 tag</param>
         /// <param name="data">Data bytes</param>
         /// <returns>ASN.1 byte array</returns>
-        protected static byte[] BuildPrimitiveAsn1Data(Tag tag, List<byte> data)
+        protected static byte[] BuildPrimitiveAsn1Data(Tag tag, IList<byte> data)
+        {
+            return BuildInternalDerData(tag, data, false);
+        }
+
+        /// <summary>
+        /// Construct ASN.1 data
+        /// </summary>
+        /// <param name="tag">ASN.1 tag</param>
+        /// <param name="data">Data bytes</param>
+        /// <returns>ASN.1 byte array</returns>
+        protected static byte[] BuildConstructedAsn1Data(Tag tag, IList<byte> data)
+        {
+            return BuildInternalDerData(tag, data, true);
+        }
+
+        /// <summary>
+        /// Construct ASN.1 data
+        /// </summary>
+        /// <param name="tag">ASN.1 tag</param>
+        /// <param name="data">Data bytes</param>
+        /// <param name="constructedFlag">Is the data stream primitive or constructed</param>
+        /// <returns>ASN.1 byte array</returns>
+        private static byte[] BuildInternalDerData(Tag tag, IList<byte> data, bool constructedFlag)
         {
             var bytes = new List<byte>(16);
             var len = data != null ? (uint)data.Count : 0;
             var lenbytes = ConstructLength(len);
 
-            bytes.Add((byte)tag);
+            if (constructedFlag)
+            {
+                var ident = (byte) ((byte) tag | (1 << 5));
+                bytes.Add(ident);
+            }
+            else
+            {
+                bytes.Add((byte) tag);
+            }
+
             bytes.AddRange(lenbytes);
 
             if (data != null && len > 0)
@@ -112,29 +132,6 @@
             return bytes.ToArray();
         }
 
-        /// <summary>
-        /// Construct ASN.1 data
-        /// </summary>
-        /// <param name="tag">ASN.1 tag</param>
-        /// <param name="data">Data bytes</param>
-        /// <returns>ASN.1 byte array</returns>
-        protected static byte[] BuildConstructedAsn1Data(Tag tag, params byte[] data)
-        {
-            var bytes = new List<byte>(16);
-            var len = data != null ? (uint)data.Length : 0;
-            var lenbytes = ConstructLength(len);
-
-            var ident = (byte) ((byte) tag | (1 << 5));
-            bytes.Add(ident);
-            bytes.AddRange(lenbytes);
-
-            if (data != null && len > 0)
-            {
-                bytes.AddRange(data);
-            }
-
-            return bytes.ToArray();
-        }
 
         /// <summary>
         /// Construct an ASN.1 length specifier
@@ -142,7 +139,7 @@
         /// <param name="len">Length to convert to ASN.1 bytes</param>
         /// <returns>ASN.1 length</returns>
         /// <remarks>X.690, section 8.1.3</remarks>
-        protected static byte[] ConstructLength(uint len)
+        private static byte[] ConstructLength(uint len)
         {
             if (len <= 0x7f)
             {

@@ -4,11 +4,21 @@
     using System.Linq;
     using System.Security.Cryptography;
 
+    /// <summary>
+    /// Class to encode an OID to DER bytes
+    /// </summary>
     public sealed class DerOid : DerEncoderBase
     {
+        /// <summary>Value to be encoded</summary>
         private readonly Oid val;
+
+        /// <summary>Bytes of encoded value</summary>
         private readonly List<byte> derbytes = new List<byte>();
 
+        /// <summary>
+        /// Initialize an instance of DerOid
+        /// </summary>
+        /// <param name="val">Value to encode</param>
         public DerOid(Oid oid)
         {
             this.val = oid;

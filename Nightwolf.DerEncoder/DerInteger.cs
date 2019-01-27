@@ -1,21 +1,39 @@
 ﻿namespace Nightwolf.DerEncoder
 {
+    /// <summary>
+    /// Class to encode a integer to DER bytes
+    /// </summary>
     public sealed class DerInteger : DerEncoderBase
     {
+        /// <summary>Value to be encoded</summary>
         private readonly int val;
+
+        /// <summary>Bytes of encoded value</summary>
         private byte[] asnBytes;
 
+        /// <summary>
+        /// Initialize an instance of DerInteger
+        /// </summary>
+        /// <param name="val">Value to encode</param>
         public DerInteger(int val)
         {
             this.val = val;
             this.UpdateAsnData(val);
         }
 
+        /// <summary>
+        /// Return value as ASN.1 DER byte array
+        /// </summary>
+        /// <returns>DER raw data</returns>
         public override byte[] GetBytes()
         {
             return this.asnBytes;
         }
 
+        /// <summary>
+        /// Return value encoded as DER
+        /// </summary>
+        /// <returns>Value encoded</returns>
         public override string ToString()
         {
             return this.val.ToString();
