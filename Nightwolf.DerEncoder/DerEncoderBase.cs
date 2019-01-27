@@ -74,7 +74,7 @@
         /// <returns>ASN.1 byte array</returns>
         protected static byte[] BuildPrimitiveAsn1Data(Tag tag, params byte[] data)
         {
-            return BuildInternalDerData(tag, data, false);
+            return BuildInternalDerData((byte)tag, data);
         }
 
         /// <summary>
@@ -85,7 +85,7 @@
         /// <returns>ASN.1 byte array</returns>
         protected static byte[] BuildPrimitiveAsn1Data(Tag tag, IList<byte> data)
         {
-            return BuildInternalDerData(tag, data, false);
+            return BuildInternalDerData((byte)tag, data);
         }
 
         /// <summary>
@@ -96,32 +96,24 @@
         /// <returns>ASN.1 byte array</returns>
         protected static byte[] BuildConstructedAsn1Data(Tag tag, IList<byte> data)
         {
-            return BuildInternalDerData(tag, data, true);
+            // Mark tag with constructed flag
+            var ident = (byte)((byte)tag | (1 << 5));
+            return BuildInternalDerData(ident, data);
         }
 
         /// <summary>
         /// Construct ASN.1 data
         /// </summary>
-        /// <param name="tag">ASN.1 tag</param>
+        /// <param name="identifier">ASN.1 tag and construction type</param>
         /// <param name="data">Data bytes</param>
-        /// <param name="constructedFlag">Is the data stream primitive or constructed</param>
         /// <returns>ASN.1 byte array</returns>
-        private static byte[] BuildInternalDerData(Tag tag, IList<byte> data, bool constructedFlag)
+        private static byte[] BuildInternalDerData(byte identifier, IList<byte> data)
         {
             var bytes = new List<byte>(16);
             var len = data != null ? (uint)data.Count : 0;
             var lenbytes = ConstructLength(len);
 
-            if (constructedFlag)
-            {
-                var ident = (byte) ((byte) tag | (1 << 5));
-                bytes.Add(ident);
-            }
-            else
-            {
-                bytes.Add((byte) tag);
-            }
-
+            bytes.Add(identifier);
             bytes.AddRange(lenbytes);
 
             if (data != null && len > 0)
