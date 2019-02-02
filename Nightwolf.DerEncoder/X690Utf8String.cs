@@ -5,13 +5,13 @@
     /// <summary>
     /// Class to encode a string to DER bytes
     /// </summary>
-    public sealed class DerUtf8String : DerEncoderBase
+    public sealed class X690Utf8String : DerEncoderBase
     {
         /// <summary>
-        /// Initialize an instance of DerBoolean
+        /// Initialize an instance of X690Boolean
         /// </summary>
         /// <param name="val">Value to encode</param>
-        public DerUtf8String(string str)
+        public X690Utf8String(string str)
         {
             this.Value = str;
             this.UpdateAsnData(str);

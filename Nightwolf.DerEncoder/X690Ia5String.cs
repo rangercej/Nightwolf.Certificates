@@ -12,13 +12,13 @@ namespace Nightwolf.DerEncoder
     /// most situations the conversion can be considered as just a change in
     /// name.
     /// </remarks>
-    public sealed class DerIa5String : DerEncoderBase
+    public sealed class X690Ia5String : DerEncoderBase
     {
         /// <summary>
-        /// Initialize an instance of DerIa5String
+        /// Initialize an instance of X690Ia5String
         /// </summary>
         /// <param name="str">Value to encode</param>
-        public DerIa5String(string str)
+        public X690Ia5String(string str)
         {
             this.Value = str;
             this.UpdateAsnData(str);

@@ -6,7 +6,7 @@
     /// <summary>
     /// Class to create a DER sequence
     /// </summary>
-    public sealed class DerSequence : DerEncoderBase
+    public sealed class X690Sequence : DerEncoderBase
     {
         /// <summary>
         /// Items in the sequence
@@ -14,10 +14,10 @@
         private readonly List<DerEncoderBase> sequenceItems = new List<DerEncoderBase>();
 
         /// <summary>
-        /// Initialize the DerSequence class
+        /// Initialize the X690Sequence class
         /// </summary>
         /// <param name="items">Items to add to the sequence</param>
-        public DerSequence(IEnumerable<DerEncoderBase> items)
+        public X690Sequence(IEnumerable<DerEncoderBase> items)
         {
             this.sequenceItems.AddRange(items);
             this.IsConstructed = true;
@@ -27,10 +27,10 @@
         }
 
         /// <summary>
-        /// Initialize the DerSequence class
+        /// Initialize the X690Sequence class
         /// </summary>
         /// <param name="items">Items to add to the sequence</param>
-        public DerSequence(params DerEncoderBase[] items)
+        public X690Sequence(params DerEncoderBase[] items)
         {
             this.sequenceItems.AddRange(items);
             this.IsConstructed = true;
@@ -40,9 +40,9 @@
         }
 
         /// <summary>
-        /// Initialize an empty DerSequence
+        /// Initialize an empty X690Sequence
         /// </summary>
-        public DerSequence()
+        public X690Sequence()
         {
             this.IsConstructed = true;
             this.Tag = (byte)X680Tag.Sequence;

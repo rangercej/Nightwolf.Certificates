@@ -41,14 +41,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DerEncoderBase.cs" />
-    <Compile Include="DerBoolean.cs" />
-    <Compile Include="DerIa5String.cs" />
-    <Compile Include="DerInteger.cs" />
-    <Compile Include="DerOid.cs" />
-    <Compile Include="DerSequence.cs" />
-    <Compile Include="DerTaggedObject.cs" />
+    <Compile Include="X690Boolean.cs" />
+    <Compile Include="X690Ia5String.cs" />
+    <Compile Include="X690Integer.cs" />
+    <Compile Include="X690Oid.cs" />
+    <Compile Include="X690Sequence.cs" />
+    <Compile Include="X690TaggedObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="DerUtf8String.cs" />
+    <Compile Include="X690Utf8String.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

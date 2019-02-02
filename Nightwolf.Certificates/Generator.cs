@@ -165,31 +165,31 @@ namespace Nightwolf.Certificates
                 this.certReq.CertificateExtensions.RemoveAt(idx);
             }
 
-            DerSequence policyText = null;
-            DerSequence policyUrl = null;
+            X690Sequence policyText = null;
+            X690Sequence policyUrl = null;
 
             if (!string.IsNullOrWhiteSpace(certPolicyStatement))
             {
-                policyText = new DerSequence(
-                    new DerOid(NamedOids.IdQtUnotice),
-                    new DerSequence(
-                        new DerUtf8String(certPolicyStatement)
+                policyText = new X690Sequence(
+                    new X690Oid(NamedOids.IdQtUnotice),
+                    new X690Sequence(
+                        new X690Utf8String(certPolicyStatement)
                     )
                 );
             }
 
             if (certPolicyUrl != null)
             {
-                policyUrl = new DerSequence(
-                    new DerOid(NamedOids.IdQtCps),
-                    new DerIa5String(certPolicyUrl.AbsoluteUri)
+                policyUrl = new X690Sequence(
+                    new X690Oid(NamedOids.IdQtCps),
+                    new X690Ia5String(certPolicyUrl.AbsoluteUri)
                 );
             }
 
-            DerSequence policyStatement = null;
+            X690Sequence policyStatement = null;
             if (policyUrl != null || policyText != null)
             {
-                policyStatement = new DerSequence();
+                policyStatement = new X690Sequence();
                 if (policyUrl != null)
                 {
                     policyStatement.Add(policyUrl);
@@ -201,18 +201,18 @@ namespace Nightwolf.Certificates
                 }
             }
 
-            var policy = new DerSequence();
+            var policy = new X690Sequence();
             if (policyStatement == null)
             {
-                policy.Add(new DerSequence(
-                        new DerOid(NamedOids.AnyPolicy)
+                policy.Add(new X690Sequence(
+                        new X690Oid(NamedOids.AnyPolicy)
                     )
                 );
             }
             else
             {
-                policy.Add(new DerSequence(
-                        new DerOid(NamedOids.AnyPolicy),
+                policy.Add(new X690Sequence(
+                        new X690Oid(NamedOids.AnyPolicy),
                         policyStatement
                     )
                 );
@@ -233,7 +233,7 @@ namespace Nightwolf.Certificates
                 this.certReq.CertificateExtensions.RemoveAt(idx);
             }
 
-            var asnBytes = new Nightwolf.DerEncoder.DerUtf8String(comment).GetBytes();
+            var asnBytes = new Nightwolf.DerEncoder.X690Utf8String(comment).GetBytes();
             var extension = new X509Extension(NamedOids.NsComment, asnBytes, false);
             this.certReq.CertificateExtensions.Add(extension);
         }
@@ -250,11 +250,11 @@ namespace Nightwolf.Certificates
                 this.certReq.CertificateExtensions.RemoveAt(idx);
             }
             
-            var data = new DerSequence(
-                new DerSequence(
-                    new DerTaggedObject(0, true,
-                        new DerTaggedObject(0, true,
-                            new DerTaggedObject(6, false, new DerIa5String(url.AbsoluteUri))
+            var data = new X690Sequence(
+                new X690Sequence(
+                    new X690TaggedObject(0, true,
+                        new X690TaggedObject(0, true,
+                            new X690TaggedObject(6, false, new X690Ia5String(url.AbsoluteUri))
                         )
                     )
                 )
@@ -276,10 +276,10 @@ namespace Nightwolf.Certificates
                 this.certReq.CertificateExtensions.RemoveAt(idx);
             }
 
-            var data = new DerSequence(
-                new DerSequence(
-                    new DerOid(NamedOids.IdAdOcsp),
-                    new DerTaggedObject(6, false, new DerIa5String(ocspEndpoint.AbsoluteUri))
+            var data = new X690Sequence(
+                new X690Sequence(
+                    new X690Oid(NamedOids.IdAdOcsp),
+                    new X690TaggedObject(6, false, new X690Ia5String(ocspEndpoint.AbsoluteUri))
                 )
             );
 
@@ -300,7 +300,7 @@ namespace Nightwolf.Certificates
                 this.certReq.CertificateExtensions.RemoveAt(idx);
             }
 
-            var asnBytes = new DerEncoder.DerUtf8String(comment).GetBytes();
+            var asnBytes = new DerEncoder.X690Utf8String(comment).GetBytes();
             var extension = new X509Extension(oid, asnBytes, false);
             this.certReq.CertificateExtensions.Add(extension);
         }
@@ -318,7 +318,7 @@ namespace Nightwolf.Certificates
                 this.certReq.CertificateExtensions.RemoveAt(idx);
             }
 
-            var asnBytes = new DerEncoder.DerInteger(val).GetBytes();
+            var asnBytes = new DerEncoder.X690Integer(val).GetBytes();
             var extension = new X509Extension(oid, asnBytes, false);
             this.certReq.CertificateExtensions.Add(extension);
         }
@@ -336,7 +336,7 @@ namespace Nightwolf.Certificates
                 this.certReq.CertificateExtensions.RemoveAt(idx);
             }
 
-            var asnBytes = new DerEncoder.DerBoolean(val).GetBytes();
+            var asnBytes = new DerEncoder.X690Boolean(val).GetBytes();
             var extension = new X509Extension(oid, asnBytes, false);
             this.certReq.CertificateExtensions.Add(extension);
         }

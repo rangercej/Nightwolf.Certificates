@@ -8,9 +8,9 @@
     /// <remarks>
     /// X.680, sec 31.2; X.690, 8.14
     /// </remarks>
-    public sealed class DerTaggedObject : DerEncoderBase
+    public sealed class X690TaggedObject : DerEncoderBase
     {
-        public DerTaggedObject(byte asnClass, bool explicitFlag, DerEncoderBase item)
+        public X690TaggedObject(byte asnClass, bool explicitFlag, DerEncoderBase item)
         {
             if (asnClass > 30)
             {

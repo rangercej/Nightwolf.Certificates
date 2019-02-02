@@ -7,13 +7,13 @@
     /// <summary>
     /// Class to encode an OID to DER bytes
     /// </summary>
-    public sealed class DerOid : DerEncoderBase
+    public sealed class X690Oid : DerEncoderBase
     {
         /// <summary>
-        /// Initialize an instance of DerOid
+        /// Initialize an instance of X690Oid
         /// </summary>
         /// <param name="oid">Value to encode</param>
-        public DerOid(Oid oid)
+        public X690Oid(Oid oid)
         {
             this.Value = oid;
             this.EncodeOid(oid);

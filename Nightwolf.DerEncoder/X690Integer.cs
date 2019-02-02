@@ -3,13 +3,13 @@
     /// <summary>
     /// Class to encode a integer to DER bytes
     /// </summary>
-    public sealed class DerInteger : DerEncoderBase
+    public sealed class X690Integer : DerEncoderBase
     {
         /// <summary>
-        /// Initialize an instance of DerInteger
+        /// Initialize an instance of X690Integer
         /// </summary>
         /// <param name="val">Value to encode</param>
-        public DerInteger(int val)
+        public X690Integer(int val)
         {
             this.Value = val;
             this.UpdateAsnData(val);

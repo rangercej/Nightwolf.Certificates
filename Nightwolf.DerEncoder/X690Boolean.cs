@@ -3,13 +3,13 @@
     /// <summary>
     /// Class to encode a boolean to DER bytes
     /// </summary>
-    public sealed class DerBoolean : DerEncoderBase
+    public sealed class X690Boolean : DerEncoderBase
     {
         /// <summary>
-        /// Initialize an instance of DerBoolean
+        /// Initialize an instance of X690Boolean
         /// </summary>
         /// <param name="val">Value to encode</param>
-        public DerBoolean(bool val)
+        public X690Boolean(bool val)
         {
             this.Value = val;
             this.EncodedValue = val ? new byte[]{ 0xff } : new byte[]{ 0x0 };

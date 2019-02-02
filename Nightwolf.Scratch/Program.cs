@@ -58,14 +58,14 @@ namespace Nightwolf.Scratch
             bytes = certsubca.Export(X509ContentType.Pfx, string.Empty);
             System.IO.File.WriteAllBytes("nightfoxsubca.pfx", bytes);
 
-            var seq = new DerSequence(
-                new DerUtf8String("Hello"),
-                new DerInteger(-63461),
-                new DerOid(new Oid("2.999.3.4.5.6.7.8.9.10")),
-                new DerSequence(
-                    new DerBoolean(false),
-                    new DerBoolean(true),
-                    new DerUtf8String("And this is the end of the world like a cat doing maths in a storm with a teacup in it's paw waiting for the end of the world caused by a dog chewing a toy bone."))
+            var seq = new X690Sequence(
+                new X690Utf8String("Hello"),
+                new X690Integer(-63461),
+                new X690Oid(new Oid("2.999.3.4.5.6.7.8.9.10")),
+                new X690Sequence(
+                    new X690Boolean(false),
+                    new X690Boolean(true),
+                    new X690Utf8String("And this is the end of the world like a cat doing maths in a storm with a teacup in it's paw waiting for the end of the world caused by a dog chewing a toy bone."))
             );
 
             var ba = seq.GetBytes();
