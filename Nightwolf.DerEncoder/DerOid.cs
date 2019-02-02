@@ -9,38 +9,17 @@
     /// </summary>
     public sealed class DerOid : DerEncoderBase
     {
-        /// <summary>Value to be encoded</summary>
-        private readonly Oid val;
-
-        /// <summary>Bytes of encoded value</summary>
-        private readonly List<byte> derbytes = new List<byte>();
-
         /// <summary>
         /// Initialize an instance of DerOid
         /// </summary>
-        /// <param name="val">Value to encode</param>
+        /// <param name="oid">Value to encode</param>
         public DerOid(Oid oid)
         {
-            this.val = oid;
-            this.EncodeOid();
-        }
-
-        /// <summary>
-        /// Return the DER-encoded bytes
-        /// </summary>
-        /// <returns>DER-encoded OID data</returns>
-        public override byte[] GetBytes()
-        {
-            return BuildPrimitiveAsn1Data(Tag.Oid, this.derbytes);
-        }
-
-        /// <summary>
-        /// Return a string representation of the value encoded.
-        /// </summary>
-        /// <returns></returns>
-        public override string ToString()
-        {
-            return this.val.Value;
+            this.Value = oid;
+            this.EncodeOid(oid);
+            this.IsConstructed = false;
+            this.Tag = (byte)X680Tag.Oid;
+            this.TagClass = X690TagClass.Universal;
         }
 
         /// <summary>
@@ -53,11 +32,11 @@
         /// first two components are treated as one, and merged by the
         /// formula: val = (x * 40) + y.
         /// </remarks>
-        private void EncodeOid()
+        private void EncodeOid(Oid oid)
         {
-            derbytes.Clear();
+            var derbytes = new List<byte>();
 
-            var components = this.val.Value.Split('.').Select(ulong.Parse);
+            var components = oid.Value.Split('.').Select(ulong.Parse);
             using (var iterator = components.GetEnumerator())
             {
                 iterator.MoveNext();
@@ -73,6 +52,8 @@
                     derbytes.AddRange(bytes);
                 }
             }
+
+            this.EncodedValue = derbytes.ToArray();
         }
 
         /// <summary>

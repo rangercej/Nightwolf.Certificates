@@ -7,59 +7,36 @@
     /// </summary>
     public sealed class DerUtf8String : DerEncoderBase
     {
-        /// <summary>Bytes of encoded value</summary>
-        private byte[] asnData;
-
-        /// <summary>String to be encoded</summary>
-        private readonly string str;
-
         /// <summary>
         /// Initialize an instance of DerBoolean
         /// </summary>
         /// <param name="val">Value to encode</param>
         public DerUtf8String(string str)
         {
-            this.str = str;
-            this.UpdateAsnData();
-        }
-
-        /// <summary>
-        /// Return original string to be encoded
-        /// </summary>
-        /// <returns>Value encoded</returns>
-        public override string ToString()
-        {
-            return this.str;
-        }
-
-        /// <summary>
-        /// Return value as ASN.1 DER byte array
-        /// </summary>
-        /// <returns>DER raw data</returns>
-        public override byte[] GetBytes()
-        {
-            return this.asnData;
+            this.Value = str;
+            this.UpdateAsnData(str);
+            this.IsConstructed = false;
+            this.Tag = (byte)X680Tag.Utf8String;
+            this.TagClass = X690TagClass.Universal;
         }
 
         /// <summary>
         /// Create the DER encoding of the string
         /// </summary>
-        private void UpdateAsnData()
+        private void UpdateAsnData(string str)
         {
-            if (this.str == null)
+            if (str == null)
             {
-                this.asnData = AsnNull;
+                this.EncodedValue = AsnNull;
                 return;
             }
 
-            if (this.str.Length == 0)
+            if (str.Length == 0)
             {
-                this.asnData = BuildPrimitiveAsn1Data(Tag.Utf8String, 0);
                 return;
             }
 
-            var charbytes = Encoding.UTF8.GetBytes(this.str);
-            this.asnData = BuildPrimitiveAsn1Data(Tag.Utf8String, charbytes);
+            this.EncodedValue = Encoding.UTF8.GetBytes(str);
         }
     }
 }

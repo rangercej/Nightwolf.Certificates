@@ -1,4 +1,6 @@
-﻿using Nightwolf.DerEncoder;
+﻿using System.Diagnostics;
+using System.Linq;
+using System.Security.Policy;
 
 namespace Nightwolf.Certificates
 {
@@ -6,6 +8,8 @@ namespace Nightwolf.Certificates
     using System.Net;
     using System.Security.Cryptography;
     using System.Security.Cryptography.X509Certificates;
+
+    using Nightwolf.DerEncoder;
 
     /// <summary>
     ///  Certificate generator
@@ -155,7 +159,7 @@ namespace Nightwolf.Certificates
         /// <remarks>Defined in RFC 5280, section 4.2.1.4</remarks>
         public void SetCertificatePolicy(string certPolicyStatement, Uri certPolicyUrl)
         {
-            var idx = FindExtensionByOid(NamedOids.CertificatePolicy);
+            var idx = FindExtensionByOid(NamedOids.IdCeCertificatePolicies);
             if (idx != -1)
             {
                 this.certReq.CertificateExtensions.RemoveAt(idx);
@@ -167,7 +171,7 @@ namespace Nightwolf.Certificates
             if (!string.IsNullOrWhiteSpace(certPolicyStatement))
             {
                 policyText = new DerSequence(
-                    new DerOid(NamedOids.PolicyQualifierIdUnotice),
+                    new DerOid(NamedOids.IdQtUnotice),
                     new DerSequence(
                         new DerUtf8String(certPolicyStatement)
                     )
@@ -177,7 +181,7 @@ namespace Nightwolf.Certificates
             if (certPolicyUrl != null)
             {
                 policyUrl = new DerSequence(
-                    new DerOid(NamedOids.PolicyQualifierIdCps),
+                    new DerOid(NamedOids.IdQtCps),
                     new DerIa5String(certPolicyUrl.AbsoluteUri)
                 );
             }
@@ -201,20 +205,20 @@ namespace Nightwolf.Certificates
             if (policyStatement == null)
             {
                 policy.Add(new DerSequence(
-                        new DerOid(NamedOids.CertificatePolicyAny)
+                        new DerOid(NamedOids.AnyPolicy)
                     )
                 );
             }
             else
             {
                 policy.Add(new DerSequence(
-                        new DerOid(NamedOids.CertificatePolicyAny),
+                        new DerOid(NamedOids.AnyPolicy),
                         policyStatement
                     )
                 );
             }
 
-            this.SetExtension(new X509Extension(NamedOids.CertificatePolicy, policy.GetBytes(), false));
+            this.SetExtension(new X509Extension(NamedOids.IdCeCertificatePolicies, policy.GetBytes(), false));
         }
 
         /// <summary>
@@ -231,6 +235,55 @@ namespace Nightwolf.Certificates
 
             var asnBytes = new Nightwolf.DerEncoder.DerUtf8String(comment).GetBytes();
             var extension = new X509Extension(NamedOids.NsComment, asnBytes, false);
+            this.certReq.CertificateExtensions.Add(extension);
+        }
+
+        /// <summary>
+        /// Set CRL distribution point extension
+        /// </summary>
+        /// <param name="url">URL of distribution point</param>
+        public void SetCrlDistributionPoint(Uri url)
+        {
+            var idx = FindExtensionByOid(NamedOids.IdCeCrlDistributionPoints);
+            if (idx != -1)
+            {
+                this.certReq.CertificateExtensions.RemoveAt(idx);
+            }
+            
+            var data = new DerSequence(
+                new DerSequence(
+                    new DerTaggedObject(0, true,
+                        new DerTaggedObject(0, true,
+                            new DerTaggedObject(6, false, new DerIa5String(url.AbsoluteUri))
+                        )
+                    )
+                )
+            );
+
+            var extension = new X509Extension(NamedOids.IdCeCrlDistributionPoints, data.GetBytes(), false);
+            this.certReq.CertificateExtensions.Add(extension);
+        }
+
+        /// <summary>
+        /// Set RFC5280 Authority Information Access
+        /// </summary>
+        /// <param name="ocspEndpoint">OCSP endpoint URL</param>
+        public void SetAuthorityInformationAccess(Uri ocspEndpoint)
+        {
+            var idx = FindExtensionByOid(NamedOids.IdPeAuthorityInfoAccess);
+            if (idx != -1)
+            {
+                this.certReq.CertificateExtensions.RemoveAt(idx);
+            }
+
+            var data = new DerSequence(
+                new DerSequence(
+                    new DerOid(NamedOids.IdAdOcsp),
+                    new DerTaggedObject(6, false, new DerIa5String(ocspEndpoint.AbsoluteUri))
+                )
+            );
+
+            var extension = new X509Extension(NamedOids.IdPeAuthorityInfoAccess, data.GetBytes(), false);
             this.certReq.CertificateExtensions.Add(extension);
         }
 

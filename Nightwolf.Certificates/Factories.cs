@@ -1,4 +1,5 @@
 ﻿using System.Security.Cryptography.X509Certificates;
+using System.Security.Policy;
 using Nightwolf.DerEncoder;
 
 namespace Nightwolf.Certificates
@@ -50,10 +51,11 @@ namespace Nightwolf.Certificates
         /// <param name="subject">Certificate subject</param>
         /// <param name="notBefore">Not valid before</param>
         /// <param name="notAfter">Not valid after</param>
+        /// <param name="crlDistributionPoint">URL of RFC 5280-compliant certificate revocation list</param>
         /// <param name="certPolicyStatement">Brief certificate policy statement (200 chars max)</param>
         /// <returns>Sub-CA certificate request template</returns>
         /// <remarks>CAB BR 7.2.2.2</remarks>
-        public static Generator CreateSubCaTemplate(string subject, DateTime notBefore, DateTime notAfter, string certPolicyStatement = null, Uri certPolicyUrl = null)
+        public static Generator CreateSubCaTemplate(string subject, DateTime notBefore, DateTime notAfter, Uri crlDistributionPoint, string certPolicyStatement = null, Uri certPolicyUrl = null)
         {
             if (certPolicyStatement != null && certPolicyStatement.Length > 200)
             {
@@ -63,8 +65,12 @@ namespace Nightwolf.Certificates
 
             var builder = new Generator(subject, DefaultCurve, DefaultHashAlgo);
             builder.SetValidityPeriod(notBefore, notAfter);
+            builder.SetBasicConstraints(new X509BasicConstraintsExtension(true, true, 1, true));
+            builder.SetKeyUsage(CaKeyUsage);
+            builder.SetCrlDistributionPoint(crlDistributionPoint);
             builder.SetCertificatePolicy(certPolicyStatement, certPolicyUrl);
-
+            builder.SetAuthorityInformationAccess(crlDistributionPoint);
+                
             return builder;
         }
         /// <summary>

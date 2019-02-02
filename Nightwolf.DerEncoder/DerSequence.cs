@@ -20,6 +20,10 @@
         public DerSequence(IEnumerable<DerEncoderBase> items)
         {
             this.sequenceItems.AddRange(items);
+            this.IsConstructed = true;
+            this.Tag = (byte)X680Tag.Sequence;
+            this.TagClass = X690TagClass.Universal;
+            this.UpdateSequenceBytes();
         }
 
         /// <summary>
@@ -29,6 +33,10 @@
         public DerSequence(params DerEncoderBase[] items)
         {
             this.sequenceItems.AddRange(items);
+            this.IsConstructed = true;
+            this.Tag = (byte)X680Tag.Sequence;
+            this.TagClass = X690TagClass.Universal;
+            this.UpdateSequenceBytes();
         }
 
         /// <summary>
@@ -36,6 +44,10 @@
         /// </summary>
         public DerSequence()
         {
+            this.IsConstructed = true;
+            this.Tag = (byte)X680Tag.Sequence;
+            this.TagClass = X690TagClass.Universal;
+            this.UpdateSequenceBytes();
         }
 
         /// <summary>
@@ -45,6 +57,7 @@
         public void Add(List<DerEncoderBase> items)
         {
             this.sequenceItems.AddRange(items);
+            this.UpdateSequenceBytes();
         }
 
         /// <summary>
@@ -54,13 +67,14 @@
         public void Add(params DerEncoderBase[] items)
         {
             this.sequenceItems.AddRange(items);
+            this.UpdateSequenceBytes();
         }
 
         /// <summary>
         /// Return sequence as ASN.1 DER byte array
         /// </summary>
         /// <returns>DER raw data</returns>
-        public override byte[] GetBytes()
+        public void UpdateSequenceBytes()
         {
             var data = new List<byte>(100);
             foreach (var i in this.sequenceItems)
@@ -68,18 +82,18 @@
                 data.AddRange(i.GetBytes());
             }
 
-            var sequence = BuildConstructedAsn1Data(Tag.Sequence, data);
-            return sequence;
+            this.EncodedValue = data.ToArray();
         }
 
         /// <summary>
         /// Return sequence as string showing encoded vlaues
         /// </summary>
         /// <returns>String data</returns>
-        /// <remarks>Not currently implemented.</remarks>
-        public override string ToString()
+        public new string ToString()
         {
-            throw new NotImplementedException();
+            return string.Format("Ident = {0}, Count = {1}, Value = [Sequence]", 
+                this.Identifier,
+                this.sequenceItems.Count);
         }
     }
 }

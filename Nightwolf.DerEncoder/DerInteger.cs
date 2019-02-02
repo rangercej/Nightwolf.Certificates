@@ -5,38 +5,17 @@
     /// </summary>
     public sealed class DerInteger : DerEncoderBase
     {
-        /// <summary>Value to be encoded</summary>
-        private readonly int val;
-
-        /// <summary>Bytes of encoded value</summary>
-        private byte[] asnBytes;
-
         /// <summary>
         /// Initialize an instance of DerInteger
         /// </summary>
         /// <param name="val">Value to encode</param>
         public DerInteger(int val)
         {
-            this.val = val;
+            this.Value = val;
             this.UpdateAsnData(val);
-        }
-
-        /// <summary>
-        /// Return value as ASN.1 DER byte array
-        /// </summary>
-        /// <returns>DER raw data</returns>
-        public override byte[] GetBytes()
-        {
-            return this.asnBytes;
-        }
-
-        /// <summary>
-        /// Return value encoded as DER
-        /// </summary>
-        /// <returns>Value encoded</returns>
-        public override string ToString()
-        {
-            return this.val.ToString();
+            this.IsConstructed = false;
+            this.Tag = (byte) X680Tag.Integer;
+            this.TagClass = X690TagClass.Universal;
         }
 
         private void UpdateAsnData(int val)
@@ -50,23 +29,23 @@
 
             if (intAsUint <= 0xff)
             {
-                this.asnBytes = BuildPrimitiveAsn1Data(Tag.Integer, b0);
+                this.EncodedValue = new[] { b0 };
                 return;
             }
 
             if (intAsUint <= 0xffff)
             {
-                this.asnBytes = BuildPrimitiveAsn1Data(Tag.Integer, b1, b0);
+                this.EncodedValue = new[] { b1, b0 };
                 return;
             }
 
             if (intAsUint <= 0xffffff)
             {
-                this.asnBytes = BuildPrimitiveAsn1Data(Tag.Integer, b2, b1, b0);
+                this.EncodedValue = new[] { b2, b1, b0 };
                 return;
             }
 
-            this.asnBytes = BuildPrimitiveAsn1Data(Tag.Integer, b3, b2, b1, b0);
+            this.EncodedValue = new[] { b3, b2, b1, b0 };
         }
     }
 }

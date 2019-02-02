@@ -1,4 +1,8 @@
-﻿namespace Nightwolf.DerEncoder
+﻿using System;
+using System.Linq;
+using System.Runtime.InteropServices;
+
+namespace Nightwolf.DerEncoder
 {
     using System.Collections.Generic;
 
@@ -7,7 +11,7 @@
         /// <summary>
         /// NULL in ASN.1 format
         /// </summary>
-        public static readonly byte[] AsnNull = { (byte)Tag.Null, 0 };
+        public static readonly byte[] AsnNull = { (byte)X680Tag.Null, 0 };
 
         /// <summary>
         /// ASN.1 tags as defined by X.680, section 8.6
@@ -15,7 +19,7 @@
         /// <remarks>
         /// Source: https://www.itu.int/rec/T-REC-X.680-201508-I/en
         /// </remarks>
-        public enum Tag : byte
+        public enum X680Tag : byte
         {
             /// <summary>Boolean type</summary>
             Boolean = 1,
@@ -55,26 +59,108 @@
         }
 
         /// <summary>
+        /// Class of tag, as defined by X.690, sec 8.1.2.
+        /// </summary>
+        public enum X690TagClass : byte
+        {
+            /// <summary>Tag is universal</summary>
+            Universal = 0,
+
+            /// <summary>Tag is application specific</summary>
+            Application = 0b0100_0000,
+
+            /// <summary>Tag is context specific</summary>
+            ContextSpecific = 0b1000_0000,
+
+            /// <summary>Tag is privately defined</summary>
+            Private = 0b1100_0000
+        }
+
+        /// <summary>
+        /// Class of the encoded entity
+        /// </summary>
+        public X690TagClass TagClass { get; protected set; }
+
+        /// <summary>
+        /// Flag indicating if the encoded value is constructed or primitive
+        /// </summary>
+        public bool IsConstructed { get; protected set; }
+
+        /// <summary>
+        /// Value that has been encoded
+        /// </summary>
+        public object Value { get; protected set; }
+        
+        /// <summary>
+        /// Tag identifier of the encoded item
+        /// </summary>
+        public byte Tag { get; protected set; }
+
+        /// <summary>
+        /// Contains the encoded value as ASN.1 bytes
+        /// </summary>
+        public byte[] EncodedValue { get; protected set; }
+
+        /// <summary>
+        /// Identifier byte as defined by X.690, 8.1.2
+        /// </summary>
+        protected byte Identifier
+        {
+            get
+            {
+                var constructedVal = (byte)(this.IsConstructed ? 0b0010_0000 : 0);
+                var classVal = (byte) this.TagClass;
+                var tagVal = (byte) this.Tag;
+
+                return (byte)(classVal | constructedVal | tagVal);
+            }
+        }
+
+        /// <summary>
         /// Convert data to ASN.1 byte array
         /// </summary>
         /// <returns>ASN.1 raw data</returns>
-        public abstract byte[] GetBytes();
+        public byte[] GetBytes()
+        {
+            var bytes = new List<byte> {this.Identifier};
+            bytes.AddRange(ConstructLength((uint)this.EncodedValue.Length));
+            bytes.AddRange(this.EncodedValue);
+
+            return bytes.ToArray();
+        }
 
         /// <summary>
         /// Return value in encoded data as string
         /// </summary>
         /// <returns>Value encoded</returns>
-        public abstract override string ToString();
+        public override string ToString()
+        {
+            return string.Format("Ident = {0:x}, Len = {1}, Val = {2}", 
+                this.Identifier, 
+                this.EncodedValue.Length,
+                this.Value);
+        }
 
         /// <summary>
         /// Construct ASN.1 data
         /// </summary>
-        /// <param name="tag">ASN.1 tag</param>
+        /// <param name="x680Tag">ASN.1 tag</param>
         /// <param name="data">Data bytes</param>
         /// <returns>ASN.1 byte array</returns>
-        protected static byte[] BuildPrimitiveAsn1Data(Tag tag, params byte[] data)
+        protected static byte[] BuildPrimitiveAsn1Data(X680Tag x680Tag, params byte[] data)
         {
-            return BuildInternalDerData((byte)tag, data);
+            return BuildInternalDerData((byte)x680Tag, data);
+        }
+
+        /// <summary>
+        /// Construct ASN.1 data
+        /// </summary>
+        /// <param name="x680Tag">ASN.1 tag</param>
+        /// <param name="data">Data bytes</param>
+        /// <returns>ASN.1 byte array</returns>
+        protected static byte[] BuildPrimitiveAsn1Data(X680Tag x680Tag, IEnumerable<byte> data)
+        {
+            return BuildInternalDerData((byte)x680Tag, data.ToList());
         }
 
         /// <summary>
@@ -83,22 +169,35 @@
         /// <param name="tag">ASN.1 tag</param>
         /// <param name="data">Data bytes</param>
         /// <returns>ASN.1 byte array</returns>
-        protected static byte[] BuildPrimitiveAsn1Data(Tag tag, IList<byte> data)
+        protected static byte[] BuildPrimitiveAsn1Data(byte tag, IEnumerable<byte> data)
         {
-            return BuildInternalDerData((byte)tag, data);
+            return BuildInternalDerData(tag, data.ToList());
         }
 
         /// <summary>
         /// Construct ASN.1 data
         /// </summary>
-        /// <param name="tag">ASN.1 tag</param>
+        /// <param name="x680Tag">ASN.1 tag</param>
         /// <param name="data">Data bytes</param>
         /// <returns>ASN.1 byte array</returns>
-        protected static byte[] BuildConstructedAsn1Data(Tag tag, IList<byte> data)
+        protected static byte[] BuildConstructedAsn1Data(X680Tag x680Tag, IEnumerable<byte> data)
         {
             // Mark tag with constructed flag
-            var ident = (byte)((byte)tag | (1 << 5));
-            return BuildInternalDerData(ident, data);
+            var ident = (byte)((byte)x680Tag | 0b0010_0000);
+            return BuildInternalDerData(ident, data.ToList());
+        }
+
+        /// <summary>
+        /// Construct ASN.1 data
+        /// </summary>
+        /// <param name="tag">ASN.1 tag</param>
+        /// <param name="data">Data bytes</param>
+        /// <returns>ASN.1 byte array</returns>
+        protected static byte[] BuildConstructedAsn1Data(byte tag, IEnumerable<byte> data)
+        {
+            // Mark tag with constructed flag
+            var ident = (byte)(tag | 0b0010_0000);
+            return BuildInternalDerData(ident, data.ToList());
         }
 
         /// <summary>
@@ -131,7 +230,7 @@
         /// <param name="len">Length to convert to ASN.1 bytes</param>
         /// <returns>ASN.1 length</returns>
         /// <remarks>X.690, section 8.1.3</remarks>
-        private static byte[] ConstructLength(uint len)
+        protected static byte[] ConstructLength(uint len)
         {
             if (len <= 0x7f)
             {

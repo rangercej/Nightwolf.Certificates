@@ -46,6 +46,7 @@
     <Compile Include="DerInteger.cs" />
     <Compile Include="DerOid.cs" />
     <Compile Include="DerSequence.cs" />
+    <Compile Include="DerTaggedObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DerUtf8String.cs" />
   </ItemGroup>

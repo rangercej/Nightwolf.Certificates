@@ -1,4 +1,6 @@
-﻿namespace Nightwolf.DerEncoder
+﻿using System.Collections.Generic;
+
+namespace Nightwolf.DerEncoder
 {
     using System.Text;
 
@@ -12,59 +14,36 @@
     /// </remarks>
     public sealed class DerIa5String : DerEncoderBase
     {
-        /// <summary>Bytes of encoded value</summary>
-        private byte[] asnData;
-
-        /// <summary>Value to be encoded</summary>
-        private readonly string str;
-
         /// <summary>
         /// Initialize an instance of DerIa5String
         /// </summary>
         /// <param name="str">Value to encode</param>
         public DerIa5String(string str)
         {
-            this.str = str;
-            this.UpdateAsnData();
-        }
-
-        /// <summary>
-        /// Return value encoded as DER
-        /// </summary>
-        /// <returns>Value encoded</returns>
-        public override string ToString()
-        {
-            return this.str;
-        }
-
-        /// <summary>
-        /// Return value as ASN.1 DER byte array
-        /// </summary>
-        /// <returns>DER raw data</returns>
-        public override byte[] GetBytes()
-        {
-            return this.asnData;
+            this.Value = str;
+            this.UpdateAsnData(str);
+            this.TagClass = X690TagClass.Application;
+            this.Tag = (byte)X680Tag.Ia5String;
+            this.IsConstructed = false;
         }
 
         /// <summary>
         /// Create the DER data bytes
         /// </summary>
-        private void UpdateAsnData()
+        private void UpdateAsnData(string val)
         {
-            if (this.str == null)
+            if (this.Value == null)
             {
-                this.asnData = AsnNull;
+                this.EncodedValue = AsnNull;
                 return;
             }
 
-            if (this.str.Length == 0)
+            if (val.Length == 0)
             {
-                this.asnData = BuildPrimitiveAsn1Data(Tag.Ia5String, 0);
                 return;
             }
 
-            var charbytes = Encoding.ASCII.GetBytes(this.str);
-            this.asnData = BuildPrimitiveAsn1Data(Tag.Ia5String, charbytes);
+            this.EncodedValue = Encoding.ASCII.GetBytes(val);
         }
     }
 }

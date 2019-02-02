@@ -42,8 +42,12 @@ namespace Nightwolf.Scratch
             System.IO.File.WriteAllBytes("cert_rsa.pfx", bytes);
 
             var rootca = Factories.CreateCaTemplate("CN=Nightfox Test CA", new DateTime(2000, 1, 1), new DateTime(2020, 1, 1));
-            var subca = Factories.CreateSubCaTemplate("CN=Nightfox Test SubCA", new DateTime(2000, 1, 1), new DateTime(2020, 1, 1), 
-                "This is a rabbit", new Uri("http://www.nightfox.org.uk/"));
+            var subca = Factories.CreateSubCaTemplate("CN=Nightfox Test SubCA",
+                new DateTime(2000, 1, 1), 
+                new DateTime(2020, 1, 1),
+                new Uri("http://www.nightfox.org.uk/crls"),
+                "This is a rabbit", 
+                new Uri("http://www.nightfox.org.uk/"));
 
             var certca = rootca.Generate();
             var certsubca = subca.Generate(certca);
