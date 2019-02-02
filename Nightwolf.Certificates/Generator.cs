@@ -254,7 +254,7 @@ namespace Nightwolf.Certificates
                 new X690Sequence(
                     new X690TaggedObject(0, true,
                         new X690TaggedObject(0, true,
-                            new X690TaggedObject(6, false, new X690Ia5String(url.AbsoluteUri))
+                            new Rfc5280GeneralName(url)
                         )
                     )
                 )
@@ -279,7 +279,7 @@ namespace Nightwolf.Certificates
             var data = new X690Sequence(
                 new X690Sequence(
                     new X690Oid(NamedOids.IdAdOcsp),
-                    new X690TaggedObject(6, false, new X690Ia5String(ocspEndpoint.AbsoluteUri))
+                    new Rfc5280GeneralName(ocspEndpoint)
                 )
             );
 

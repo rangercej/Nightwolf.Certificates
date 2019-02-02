@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DerEncoderBase.cs" />
+    <Compile Include="Rfc5280GeneralName.cs" />
     <Compile Include="X690Boolean.cs" />
     <Compile Include="X690Ia5String.cs" />
     <Compile Include="X690Integer.cs" />
