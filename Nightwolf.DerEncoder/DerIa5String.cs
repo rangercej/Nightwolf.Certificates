@@ -22,7 +22,7 @@ namespace Nightwolf.DerEncoder
         {
             this.Value = str;
             this.UpdateAsnData(str);
-            this.TagClass = X690TagClass.Application;
+            this.TagClass = X690TagClass.Universal;
             this.Tag = (byte)X680Tag.Ia5String;
             this.IsConstructed = false;
         }
