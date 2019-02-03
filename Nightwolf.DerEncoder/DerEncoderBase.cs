@@ -27,6 +27,9 @@ namespace Nightwolf.DerEncoder
             /// <summary>Integer type</summary>
             Integer = 2,
 
+            /// <summary>Octetstring type</summary>
+            OctetString = 4,
+
             /// <summary>Null type</summary>
             Null = 5,
 

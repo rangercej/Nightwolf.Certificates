@@ -45,6 +45,7 @@
     <Compile Include="X690Boolean.cs" />
     <Compile Include="X690Ia5String.cs" />
     <Compile Include="X690Integer.cs" />
+    <Compile Include="X690OctetString.cs" />
     <Compile Include="X690Oid.cs" />
     <Compile Include="X690Sequence.cs" />
     <Compile Include="X690TaggedObject.cs" />
