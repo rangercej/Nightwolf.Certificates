@@ -11,15 +11,24 @@
     public static class ExtendedKeyUses
     {
         /// <summary>OID for Server Authentication use</summary>
-        public static readonly Oid ServerAuth = new Oid("1.3.6.1.5.5.7.3.1");
+        public static readonly Oid ServerAuth = NamedOids.IdKpServerAuth;
 
         /// <summary>OID for Client Authentication use</summary>
-        public static readonly Oid ClientAuth = new Oid("1.3.6.1.5.5.7.3.2");
+        public static readonly Oid ClientAuth = NamedOids.IdKpClientAuth;
 
         /// <summary>OID for Code Signing use</summary>
-        public static readonly Oid CodeSigning = new Oid("1.3.6.1.5.5.7.3.3");
+        public static readonly Oid CodeSigning = NamedOids.IdKpCodeSigning;
+
+        /// <summary>OID for email protection use</summary>
+        public static readonly Oid EmailProtection = NamedOids.IdKpEmailProtection;
+
+        /// <summary>OID for timestamping use</summary>
+        public static readonly Oid TimeStamping = NamedOids.IdKpTimeStamping;
+
+        /// <summary>OID for OCSP signing use</summary>
+        public static readonly Oid OcspSigning = NamedOids.IdKpOcspSigning;
 
         /// <summary>OID for Smartcard Login use</summary>
-        public static readonly Oid SmartcardLogin = new Oid("1.3.6.1.4.1.311.20.2.2");
+        public static readonly Oid SmartcardLogin = NamedOids.XcnOidKpSmartcardLogon;
     }
 }
