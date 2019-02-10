@@ -297,7 +297,7 @@ namespace Nightwolf.Certificates
         /// <param name="oid">OID for extension</param>
         /// <param name="comment">Comment text</param>
         /// <param name="critical">Mark extension as critical</param>
-        public void SetCustomValue(Oid oid, string comment, bool critical)
+        public void SetCustomValue(Oid oid, string comment, bool critical = false)
         {
             var idx = FindExtensionByOid(oid);
             if (idx != -1)
@@ -316,7 +316,7 @@ namespace Nightwolf.Certificates
         /// <param name="oid">OID for extension</param>
         /// <param name="val">Value to include</param>
         /// <param name="critical">Mark extension as critical</param>
-        public void SetCustomValue(Oid oid, int val, bool critical)
+        public void SetCustomValue(Oid oid, int val, bool critical = false)
         {
             var idx = FindExtensionByOid(oid);
             if (idx != -1)
@@ -335,7 +335,7 @@ namespace Nightwolf.Certificates
         /// <param name="oid">OID for extension</param>
         /// <param name="val">Value to include</param>
         /// <param name="critical">Mark extension as critical</param>
-        public void SetCustomValue(Oid oid, bool val, bool critical)
+        public void SetCustomValue(Oid oid, bool val, bool critical = false)
         {
             var idx = FindExtensionByOid(oid);
             if (idx != -1)
