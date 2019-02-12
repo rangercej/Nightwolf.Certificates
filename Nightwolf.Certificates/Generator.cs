@@ -160,12 +160,6 @@ namespace Nightwolf.Certificates
         /// <remarks>Defined in RFC 5280, section 4.2.1.4</remarks>
         public void SetCertificatePolicy(string certPolicyStatement, Uri certPolicyUrl, bool critical = false)
         {
-            var idx = FindExtensionByOid(NamedOids.IdCeCertificatePolicies);
-            if (idx != -1)
-            {
-                this.certReq.CertificateExtensions.RemoveAt(idx);
-            }
-
             X690Sequence policyText = null;
             X690Sequence policyUrl = null;
 
@@ -219,7 +213,8 @@ namespace Nightwolf.Certificates
                 );
             }
 
-            this.SetExtension(new X509Extension(NamedOids.IdCeCertificatePolicies, policy.GetBytes(), critical));
+            var extension = new X509Extension(NamedOids.IdCeCertificatePolicies, policy.GetBytes(), critical);
+            this.SetExtension(extension);
         }
 
         /// <summary>
@@ -229,12 +224,6 @@ namespace Nightwolf.Certificates
         /// <param name="critical">Mark extension as critical</param>
         public void SetComment(string comment, bool critical = false)
         {
-            var idx = FindExtensionByOid(NamedOids.NsComment);
-            if (idx != -1)
-            {
-                this.certReq.CertificateExtensions.RemoveAt(idx);
-            }
-
             var asnBytes = new Nightwolf.DerEncoder.X690Utf8String(comment).GetBytes();
             var extension = new X509Extension(NamedOids.NsComment, asnBytes, critical);
             this.SetExtension(extension);
@@ -247,12 +236,6 @@ namespace Nightwolf.Certificates
         /// <param name="critical">Mark extension as critical</param>
         public void SetCrlDistributionPoint(Uri url, bool critical = false)
         {
-            var idx = FindExtensionByOid(NamedOids.IdCeCrlDistributionPoints);
-            if (idx != -1)
-            {
-                this.certReq.CertificateExtensions.RemoveAt(idx);
-            }
-            
             var data = new X690Sequence(
                 new X690Sequence(
                     new X690TaggedObject(0, true,
@@ -274,12 +257,6 @@ namespace Nightwolf.Certificates
         /// <param name="critical">Mark extension as critical</param>
         public void SetAuthorityInformationAccess(Uri ocspEndpoint, bool critical = false)
         {
-            var idx = FindExtensionByOid(NamedOids.IdPeAuthorityInfoAccess);
-            if (idx != -1)
-            {
-                this.certReq.CertificateExtensions.RemoveAt(idx);
-            }
-
             var data = new X690Sequence(
                 new X690Sequence(
                     new X690Oid(NamedOids.IdAdOcsp),
@@ -299,15 +276,9 @@ namespace Nightwolf.Certificates
         /// <param name="critical">Mark extension as critical</param>
         public void SetCustomValue(Oid oid, string comment, bool critical = false)
         {
-            var idx = FindExtensionByOid(oid);
-            if (idx != -1)
-            {
-                this.certReq.CertificateExtensions.RemoveAt(idx);
-            }
-
             var asnBytes = new DerEncoder.X690Utf8String(comment).GetBytes();
             var extension = new X509Extension(oid, asnBytes, critical);
-            this.certReq.CertificateExtensions.Add(extension);
+            this.SetExtension(extension);
         }
 
         /// <summary>
@@ -318,15 +289,9 @@ namespace Nightwolf.Certificates
         /// <param name="critical">Mark extension as critical</param>
         public void SetCustomValue(Oid oid, int val, bool critical = false)
         {
-            var idx = FindExtensionByOid(oid);
-            if (idx != -1)
-            {
-                this.certReq.CertificateExtensions.RemoveAt(idx);
-            }
-
             var asnBytes = new DerEncoder.X690Integer(val).GetBytes();
             var extension = new X509Extension(oid, asnBytes, critical);
-            this.certReq.CertificateExtensions.Add(extension);
+            this.SetExtension(extension);
         }
 
         /// <summary>
@@ -337,15 +302,9 @@ namespace Nightwolf.Certificates
         /// <param name="critical">Mark extension as critical</param>
         public void SetCustomValue(Oid oid, bool val, bool critical = false)
         {
-            var idx = FindExtensionByOid(oid);
-            if (idx != -1)
-            {
-                this.certReq.CertificateExtensions.RemoveAt(idx);
-            }
-
             var asnBytes = new DerEncoder.X690Boolean(val).GetBytes();
             var extension = new X509Extension(oid, asnBytes, critical);
-            this.certReq.CertificateExtensions.Add(extension);
+            this.SetExtension(extension);
         }
 
         /// <summary>
