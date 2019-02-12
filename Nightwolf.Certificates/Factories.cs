@@ -1,13 +1,10 @@
-﻿using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Security.Policy;
-using Nightwolf.DerEncoder;
-
-namespace Nightwolf.Certificates
+﻿namespace Nightwolf.Certificates
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Security.Cryptography;
+    using System.Security.Cryptography.X509Certificates;
 
     /// <summary>
     /// Certificate static factory methods to quickly build certificates

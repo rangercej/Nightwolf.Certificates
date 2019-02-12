@@ -1,10 +1,7 @@
-﻿using System;
-using System.Linq;
-using System.Runtime.InteropServices;
-
-namespace Nightwolf.DerEncoder
+﻿namespace Nightwolf.DerEncoder
 {
     using System.Collections.Generic;
+    using System.Linq;
 
     public abstract class DerEncoderBase
     {

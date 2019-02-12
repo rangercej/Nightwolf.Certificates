@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Nightwolf.DerEncoder
+﻿namespace Nightwolf.DerEncoder
 {
     using System.Text;
 

@@ -1,8 +1,4 @@
-﻿using System.Diagnostics;
-using System.Linq;
-using System.Security.Policy;
-
-namespace Nightwolf.Certificates
+﻿namespace Nightwolf.Certificates
 {
     using System;
     using System.Net;
