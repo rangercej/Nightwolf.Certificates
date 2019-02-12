@@ -1,4 +1,6 @@
-﻿namespace Nightwolf.Certificates
+﻿using System.Linq;
+
+namespace Nightwolf.Certificates
 {
     using System;
     using System.Net;
@@ -29,6 +31,9 @@
 
         /// <summary>Certificate alternate names</summary>
         private SubjectAlternativeNameBuilder sanBuilder;
+
+        /// <summary>Certificate serial number</summary>
+        private byte[] serialNumber = null;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Generator"/> class with default parameters.
@@ -145,6 +150,39 @@
 
             this.startDateTime = startTimestamp;
             this.endDateTime = endTimestamp;
+        }
+
+        /// <summary>
+        /// Set certificate serial number
+        /// </summary>
+        /// <param name="serialBytes">8 to 20 byte array containning serial number value</param>
+        /// <remarks>The CAB forum requirements, sec 7.1, states that serial numbers
+        /// should be non-sequential containing at least 64-bits of output from a
+        /// cryptographically strong RNG.
+        /// 
+        /// RFC5280, sec 4.1.2.2 says that the serial number field can be no 
+        /// more than 20 bytes.
+        ///
+        /// If not explicitly set, this library will generate a 16-byte serial
+        /// number.
+        ///
+        /// Additionally, this method has no effect when generating a self-signed
+        /// certificate.
+        /// </remarks>
+        public void SetSerialNumber(byte[] serialBytes)
+        {
+            if (serialBytes == null)
+            {
+                throw new ArgumentNullException(nameof(serialBytes));
+            }
+
+            if (serialBytes.Length < 8 || serialBytes.Length > 20)
+            {
+                throw new ArgumentException("Serial number must be between 8 and 20 bytes", nameof(serialBytes));
+            }
+
+            this.serialNumber = new byte[serialBytes.Length];
+            serialBytes.CopyTo(this.serialNumber, 0);
         }
 
         /// <summary>
@@ -332,8 +370,9 @@
         }
 
         /// <summary>
-        /// Set the appropriate parts for a CA authority
+        /// Set the certificate key usage flags.
         /// </summary>
+        /// <param name="useFlags">Certificate use flags</param>
         public void SetKeyUsage(X509KeyUsageFlags useFlags)
         {
             var idx = this.FindExtension<X509KeyUsageExtension>();
@@ -367,6 +406,7 @@
         /// </summary>
         /// <param name="issuer">Issuing authority certificate</param>
         /// <returns>X509 certificate</returns>
+        /// <remarks>Specifying a null issuer will generate a self-signed certificate</remarks>
         public X509Certificate2 Generate(X509Certificate2 issuer = null)
         {
             if (this.startDateTime == null)
@@ -396,10 +436,15 @@
             }
             else
             {
-                var serialNumber = new byte[8];
-                this.rng.GetBytes(serialNumber);
+                if (this.serialNumber == null)
+                {
+                    this.serialNumber = new byte[16];
+                    this.rng.GetBytes(this.serialNumber);
+                }
+
                 cert = this.certReq.Create(issuer, this.startDateTime.Value, this.endDateTime.Value, serialNumber);
             }
+
             return cert;
         }
 
