@@ -32,7 +32,7 @@ The methods available are:
 * `CreateSubCaTemplate` - creates a certificate template for a sub-CA certificate
 * `CreateSubscriberTemplate` - creates the end-user subscriber certificate
 
-In all three cases, they return an instance of `Nightwolf.CertificateGenerator`,
+In all three cases, they return an instance of `Nightwolf.Certificates.Generator`,
 allowing the template to be modified further before generation.
 
 ### Nightwolf.Certificates.Generator
