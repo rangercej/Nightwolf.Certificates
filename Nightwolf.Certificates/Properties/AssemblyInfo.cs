@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("CertificateGenerator")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Nightwolf Certificate Builder")]
+[assembly: AssemblyDescription("Wrapper to ease the pain of creating X.509 certificates")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("CertificateGenerator")]
+[assembly: AssemblyCompany("Chris Johnson")]
+[assembly: AssemblyProduct("")]
 [assembly: AssemblyCopyright("Copyright ©  2019 Chris Johnson")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

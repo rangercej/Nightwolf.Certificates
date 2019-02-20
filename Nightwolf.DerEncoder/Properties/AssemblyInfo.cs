@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Nightwolf.Asn1")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Nightwolf DER Encoder")]
+[assembly: AssemblyDescription("X.690 DER encoder")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Nightwolf.Asn1")]
-[assembly: AssemblyCopyright("Copyright ©  2019")]
+[assembly: AssemblyCompany("Chris Johnson")]
+[assembly: AssemblyProduct("")]
+[assembly: AssemblyCopyright("Copyright © 2019 Chris Johnson")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
