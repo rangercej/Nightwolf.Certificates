@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <projectUrl>https://github.com/rangercej/CertificateGenerator</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <releaseNotes>Initial release.</releaseNotes>
+    <copyright>Copyright 2019</copyright>
+    <tags>X509 X609 DER Certificates</tags>
+  <references>
+    <reference file="Nightwolf.Certificates.dll" />
+    <reference file="Nightwolf.DerEncoder.dll" />
+  </references>
+  </metadata>
+  <files>
+    <file src="bin\$configuration$\Nightwolf.DerEncoder.dll" target="lib\net472" />
+  </files>
+</package>
