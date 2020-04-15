@@ -445,7 +445,33 @@
                     this.rng.GetBytes(this.serialNumber);
                 }
 
-                var certOnly = this.certReq.Create(issuer, this.startDateTime.Value, this.endDateTime.Value, serialNumber);
+                X509Certificate2 certOnly;
+                if (issuer.PublicKey.Oid.Value != this.certReq.PublicKey.Oid.Value)
+                {
+                    X509SignatureGenerator sigGen;
+                    if (issuer.PublicKey.Oid.Value == NamedOids.IdEcPublicKey.Value)
+                    {
+                        var key = issuer.GetECDsaPrivateKey();
+                        sigGen = X509SignatureGenerator.CreateForECDsa(key);
+                    } 
+                    else if (issuer.PublicKey.Oid.Value == NamedOids.RsaEncryption.Value)
+                    {
+                        var key = issuer.GetRSAPrivateKey();
+                        sigGen = X509SignatureGenerator.CreateForRSA(key, RSASignaturePadding.Pkcs1);
+                    }
+                    else
+                    {
+                        throw new ArgumentOutOfRangeException("Unsupported public key algorithm in issuing certificate");
+                    }
+
+                    var issuerDn = issuer.SubjectName;
+                    certOnly = this.certReq.Create(issuerDn, sigGen, this.startDateTime.Value, this.endDateTime.Value, serialNumber);
+                }
+                else
+                {
+                    certOnly = this.certReq.Create(issuer, this.startDateTime.Value, this.endDateTime.Value, serialNumber);
+                }
+
                 cert = this.privateKey.MergeIntoCertificate(certOnly);
             }
 

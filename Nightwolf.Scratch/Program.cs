@@ -33,13 +33,18 @@ namespace Nightwolf.Scratch
             System.IO.File.WriteAllBytes("cert_ec.pfx", bytes);
 
             // Create certificate with custom strength
-            gen = new Generator("CN=example.org", 2048, HashAlgorithmName.SHA384);
+            gen = new Generator("CN=example.org", ECCurve.NamedCurves.nistP384, HashAlgorithmName.SHA384);
             gen.SetComment("This is a comment");
             gen.SetValidityPeriod(new DateTime(2000, 1, 1), new DateTime(2010, 1, 1));
+            gen.SetBasicConstraints(new X509BasicConstraintsExtension(true, true, 2, true));
             //gen.SetCertAsCa();
             cert = gen.Generate();
             bytes = cert.Export(X509ContentType.Pfx, string.Empty);
             System.IO.File.WriteAllBytes("cert_rsa.pfx", bytes);
+
+            var subgen = new Generator("CN=sub.org", 4096, HashAlgorithmName.SHA256);
+            subgen.SetValidityPeriod(new DateTime(2000, 1, 1), new DateTime(2010, 1, 1));
+            var subcert = subgen.Generate(cert);
 
             var rootca = Factories.CreateCaTemplate("CN=Nightfox Test CA", new DateTime(2000, 1, 1), new DateTime(2020, 1, 1));
             var subca = Factories.CreateSubCaTemplate("CN=Nightfox Test SubCA",
