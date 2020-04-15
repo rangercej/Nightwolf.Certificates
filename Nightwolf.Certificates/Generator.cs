@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace Nightwolf.Certificates
+﻿namespace Nightwolf.Certificates
 {
     using System;
     using System.Net;
@@ -16,6 +14,9 @@ namespace Nightwolf.Certificates
     {
         /// <summary>Certificate builder</summary>
         private readonly CertificateRequest certReq;
+
+        /// <summary>Certificate private key</summary>
+        private CertificateKey privateKey;
 
         /// <summary>Extended key uses</summary>
         private readonly OidCollection extendedUses = new OidCollection();
@@ -53,6 +54,7 @@ namespace Nightwolf.Certificates
         public Generator(string subject, ECCurve curve, HashAlgorithmName hash)
         {
             var key = GenerateEcKey(curve);
+            this.privateKey = new CertificateKey(key);
             this.certReq = new CertificateRequest(subject, key, hash);
         }
 
@@ -65,6 +67,7 @@ namespace Nightwolf.Certificates
         public Generator(string subject, int size, HashAlgorithmName hash)
         {
             var key = GenerateRsaKey(size);
+            this.privateKey = new CertificateKey(key);
             this.certReq = new CertificateRequest(subject, key, hash, RSASignaturePadding.Pkcs1);
         }
 
@@ -442,7 +445,34 @@ namespace Nightwolf.Certificates
                     this.rng.GetBytes(this.serialNumber);
                 }
 
-                cert = this.certReq.Create(issuer, this.startDateTime.Value, this.endDateTime.Value, serialNumber);
+                X509Certificate2 certOnly;
+                if (issuer.PublicKey.Oid.Value != this.certReq.PublicKey.Oid.Value)
+                {
+                    X509SignatureGenerator sigGen;
+                    if (issuer.PublicKey.Oid.Value == NamedOids.IdEcPublicKey.Value)
+                    {
+                        var key = issuer.GetECDsaPrivateKey();
+                        sigGen = X509SignatureGenerator.CreateForECDsa(key);
+                    } 
+                    else if (issuer.PublicKey.Oid.Value == NamedOids.RsaEncryption.Value)
+                    {
+                        var key = issuer.GetRSAPrivateKey();
+                        sigGen = X509SignatureGenerator.CreateForRSA(key, RSASignaturePadding.Pkcs1);
+                    }
+                    else
+                    {
+                        throw new ArgumentOutOfRangeException("Unsupported public key algorithm in issuing certificate");
+                    }
+
+                    var issuerDn = issuer.SubjectName;
+                    certOnly = this.certReq.Create(issuerDn, sigGen, this.startDateTime.Value, this.endDateTime.Value, serialNumber);
+                }
+                else
+                {
+                    certOnly = this.certReq.Create(issuer, this.startDateTime.Value, this.endDateTime.Value, serialNumber);
+                }
+
+                cert = this.privateKey.MergeIntoCertificate(certOnly);
             }
 
             return cert;

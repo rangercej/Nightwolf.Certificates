@@ -86,6 +86,10 @@
         /// popular none the less where building certificates for internal use.</remarks>
         public static readonly Oid NsComment = ConstructOid("2.16.840.1.113730.1.13");
 
+        /// <remarks>Public key algorithm OIDs from RFC3279</remarks>
+        public static readonly Oid RsaEncryption = ConstructOid("1.2.840.113549.1.1.1");
+        public static readonly Oid IdEcPublicKey = ConstructOid("1.2.840.10045.2.1");
+
         /// <summary>
         /// Create a new OID object
         /// </summary>

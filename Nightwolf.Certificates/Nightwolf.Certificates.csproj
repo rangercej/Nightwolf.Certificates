@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CertificateKey.cs" />
     <Compile Include="ExtendedKeyUse.cs" />
     <Compile Include="Factories.cs" />
     <Compile Include="Generator.cs" />
