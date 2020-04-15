@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace Nightwolf.Certificates
+﻿namespace Nightwolf.Certificates
 {
     using System;
     using System.Net;
@@ -16,6 +14,9 @@ namespace Nightwolf.Certificates
     {
         /// <summary>Certificate builder</summary>
         private readonly CertificateRequest certReq;
+
+        /// <summary>Certificate private key</summary>
+        private CertificateKey privateKey;
 
         /// <summary>Extended key uses</summary>
         private readonly OidCollection extendedUses = new OidCollection();
@@ -53,6 +54,7 @@ namespace Nightwolf.Certificates
         public Generator(string subject, ECCurve curve, HashAlgorithmName hash)
         {
             var key = GenerateEcKey(curve);
+            this.privateKey = new CertificateKey(key);
             this.certReq = new CertificateRequest(subject, key, hash);
         }
 
@@ -65,6 +67,7 @@ namespace Nightwolf.Certificates
         public Generator(string subject, int size, HashAlgorithmName hash)
         {
             var key = GenerateRsaKey(size);
+            this.privateKey = new CertificateKey(key);
             this.certReq = new CertificateRequest(subject, key, hash, RSASignaturePadding.Pkcs1);
         }
 
@@ -442,7 +445,8 @@ namespace Nightwolf.Certificates
                     this.rng.GetBytes(this.serialNumber);
                 }
 
-                cert = this.certReq.Create(issuer, this.startDateTime.Value, this.endDateTime.Value, serialNumber);
+                var certOnly = this.certReq.Create(issuer, this.startDateTime.Value, this.endDateTime.Value, serialNumber);
+                cert = this.privateKey.MergeIntoCertificate(certOnly);
             }
 
             return cert;
