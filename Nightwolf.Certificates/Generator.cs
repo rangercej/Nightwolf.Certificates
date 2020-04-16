@@ -432,50 +432,64 @@
                 this.certReq.CertificateExtensions.Add(new X509EnhancedKeyUsageExtension(this.extendedUses, false));
             }
 
-            X509Certificate2 cert;
             if (issuer == null)
             {
-                cert = this.certReq.CreateSelfSigned(this.startDateTime.Value, this.endDateTime.Value);
+                return this.certReq.CreateSelfSigned(this.startDateTime.Value, this.endDateTime.Value);
             }
             else
             {
-                if (this.serialNumber == null)
-                {
-                    this.serialNumber = new byte[16];
-                    this.rng.GetBytes(this.serialNumber);
-                }
+                return this.SignCertificate(issuer);
+            }
+        }
 
-                X509Certificate2 certOnly;
-                if (issuer.PublicKey.Oid.Value != this.certReq.PublicKey.Oid.Value)
-                {
-                    X509SignatureGenerator sigGen;
-                    if (issuer.PublicKey.Oid.Value == NamedOids.IdEcPublicKey.Value)
-                    {
-                        var key = issuer.GetECDsaPrivateKey();
-                        sigGen = X509SignatureGenerator.CreateForECDsa(key);
-                    } 
-                    else if (issuer.PublicKey.Oid.Value == NamedOids.RsaEncryption.Value)
-                    {
-                        var key = issuer.GetRSAPrivateKey();
-                        sigGen = X509SignatureGenerator.CreateForRSA(key, RSASignaturePadding.Pkcs1);
-                    }
-                    else
-                    {
-                        throw new ArgumentOutOfRangeException("Unsupported public key algorithm in issuing certificate");
-                    }
-
-                    var issuerDn = issuer.SubjectName;
-                    certOnly = this.certReq.Create(issuerDn, sigGen, this.startDateTime.Value, this.endDateTime.Value, serialNumber);
-                }
-                else
-                {
-                    certOnly = this.certReq.Create(issuer, this.startDateTime.Value, this.endDateTime.Value, serialNumber);
-                }
-
-                cert = this.privateKey.MergeIntoCertificate(certOnly);
+        /// <summary>
+        /// Sign a certificate with an issuing certificate
+        /// </summary>
+        /// <param name="issuer">Issuing certificate</param>
+        /// <returns>Signed certificate</returns>
+        private X509Certificate2 SignCertificate(X509Certificate2 issuer)
+        {
+            if (this.serialNumber == null)
+            {
+                this.serialNumber = new byte[16];
+                this.rng.GetBytes(this.serialNumber);
             }
 
-            return cert;
+            X509Certificate2 certOnly;
+            if (issuer.PublicKey.Oid.Value != this.certReq.PublicKey.Oid.Value)
+            {
+                var sigGen = this.GetGeneratorForCertificate(issuer);
+                certOnly = this.certReq.Create(issuer.SubjectName, sigGen, this.startDateTime.Value, this.endDateTime.Value, this.serialNumber);
+            }
+            else
+            {
+                certOnly = this.certReq.Create(issuer, this.startDateTime.Value, this.endDateTime.Value, this.serialNumber);
+            }
+
+            return this.privateKey.MergeIntoCertificate(certOnly);
+        }
+
+        /// <summary>
+        /// Get a signature generator for a given issuing certificate
+        /// </summary>
+        /// <param name="issuer">Issuing certificate</param>
+        /// <returns>Signature generator for the certificate</returns>
+        private X509SignatureGenerator GetGeneratorForCertificate(X509Certificate2 issuer)
+        {
+            if (issuer.PublicKey.Oid.Value == NamedOids.IdEcPublicKey.Value)
+            {
+                var key = issuer.GetECDsaPrivateKey();
+                return X509SignatureGenerator.CreateForECDsa(key);
+            }
+            else if (issuer.PublicKey.Oid.Value == NamedOids.RsaEncryption.Value)
+            {
+                var key = issuer.GetRSAPrivateKey();
+                return X509SignatureGenerator.CreateForRSA(key, RSASignaturePadding.Pkcs1);
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException("Unsupported public key algorithm in issuing certificate");
+            }
         }
 
         /// <summary>
