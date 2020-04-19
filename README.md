@@ -1,4 +1,4 @@
-# CertificateGenerator [![Build Status](https://travis-ci.org/rangercej/CertificateGenerator.svg?branch=master)](https://travis-ci.org/rangercej/CertificateGenerator)
+# CertificateGenerator
 
 This project contains two parts:
 
