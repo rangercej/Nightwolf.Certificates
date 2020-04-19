@@ -1,23 +1,23 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>$id$</id>
+    <id>Nightwolf.Certificates</id>
     <version>$version$</version>
-    <title>$title$</title>
-    <authors>$author$</authors>
-    <owners>$author$</owners>
+    <title>Nightwolf Certificate Builder</title>
+    <authors>Chris Johnson</authors>
+    <owners>Chris Johnson</owners>
     <projectUrl>https://github.com/rangercej/CertificateGenerator</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>$description$</description>
+    <description>Wrapper to ease the pain of creating X.509 certificates</description>
     <releaseNotes>Initial release.</releaseNotes>
     <copyright>Copyright 2019</copyright>
     <tags>X509 X609 DER Certificates</tags>
-  <references>
-    <reference file="Nightwolf.Certificates.dll" />
-    <reference file="Nightwolf.DerEncoder.dll" />
-  </references>
+    <dependencies>
+      <group targetFramework=".NETFramework4.7.2" />
+    </dependencies>
   </metadata>
   <files>
     <file src="bin\$configuration$\Nightwolf.DerEncoder.dll" target="lib\net472" />
+    <file src="bin\$configuration$\Nightwolf.Certificates.dll" target="lib\net472" />
   </files>
 </package>
