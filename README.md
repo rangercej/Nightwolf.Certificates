@@ -1,4 +1,4 @@
-# CertificateGenerator
+# CertificateGenerator ![.NET Core](https://github.com/rangercej/Nightwolf.Certificates/workflows/.NET%20Core/badge.svg)
 
 This project contains two parts:
 
