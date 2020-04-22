@@ -45,10 +45,12 @@
             subjectCert.SetValidityPeriod(startDate, endDate);
             var subject = subjectCert.Generate(rootCert);
 
+            var chainIsValid = this.ValidateChain(subject, rootCert);
+
+            Assert.IsTrue(chainIsValid);
             Assert.IsTrue(subject.NotBefore == startDate);
             Assert.IsTrue(subject.NotAfter == endDate);
             Assert.IsTrue(subject.HasPrivateKey);
-            Assert.IsTrue(subject.Issuer == rootCert.Subject);
         }
 
         [TestMethod]
@@ -73,10 +75,12 @@
             subjectCert.SetValidityPeriod(startDate, endDate);
             var subject = subjectCert.Generate(rootCert);
 
+            var chainIsValid = this.ValidateChain(subject, rootCert);
+
+            Assert.IsTrue(chainIsValid);
             Assert.IsTrue(subject.NotBefore == startDate);
             Assert.IsTrue(subject.NotAfter == endDate);
             Assert.IsTrue(subject.HasPrivateKey);
-            Assert.IsTrue(subject.Issuer == rootCert.Subject);
             Assert.IsTrue(subject.PublicKey.Oid.Value == NamedOids.RsaEncryption.Value);
             Assert.IsTrue(((RSA)subject.PublicKey.Key).KeySize == 4096);
         }
@@ -102,10 +106,12 @@
             subjectCert.SetValidityPeriod(startDate, endDate);
             var subject = subjectCert.Generate(rootCert);
 
+            var chainIsValid = this.ValidateChain(subject, rootCert);
+
+            Assert.IsTrue(chainIsValid);
             Assert.IsTrue(subject.NotBefore == startDate);
             Assert.IsTrue(subject.NotAfter == endDate);
             Assert.IsTrue(subject.HasPrivateKey);
-            Assert.IsTrue(subject.Issuer == rootCert.Subject);
             Assert.IsTrue(subject.PublicKey.Oid.Value == NamedOids.IdEcPublicKey.Value);
             Assert.IsTrue(subject.GetECDsaPublicKey().KeySize == 521);
         }
@@ -132,10 +138,12 @@
             subjectCert.SetValidityPeriod(startDate, endDate);
             var subject = subjectCert.Generate(rootCert);
 
+            var chainIsValid = this.ValidateChain(subject, rootCert);
+
+            Assert.IsTrue(chainIsValid);
             Assert.IsTrue(subject.NotBefore == startDate);
             Assert.IsTrue(subject.NotAfter == endDate);
             Assert.IsTrue(subject.HasPrivateKey);
-            Assert.IsTrue(subject.Issuer == rootCert.Subject);
             Assert.IsTrue(subject.PublicKey.Oid.Value == NamedOids.RsaEncryption.Value);
             Assert.IsTrue(subject.GetRSAPublicKey().KeySize == 4096);
         }
@@ -162,10 +170,12 @@
             subjectCert.SetValidityPeriod(startDate, endDate);
             var subject = subjectCert.Generate(rootCert);
 
+            var chainIsValid = this.ValidateChain(subject, rootCert);
+
+            Assert.IsTrue(chainIsValid);
             Assert.IsTrue(subject.NotBefore == startDate);
             Assert.IsTrue(subject.NotAfter == endDate);
             Assert.IsTrue(subject.HasPrivateKey);
-            Assert.IsTrue(subject.Issuer == rootCert.Subject);
             Assert.IsTrue(subject.PublicKey.Oid.Value == NamedOids.IdEcPublicKey.Value);
             Assert.IsTrue(subject.GetECDsaPublicKey().KeySize == 521);
         }
@@ -183,12 +193,7 @@
             var certSubCa = subca.Generate(certCa);
             var certSubject = subject.Generate(certSubCa);
 
-            var chain = new X509Chain();
-            chain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
-            chain.ChainPolicy.VerificationFlags = X509VerificationFlags.AllowUnknownCertificateAuthority;
-            chain.ChainPolicy.ExtraStore.Add(certCa);
-            chain.ChainPolicy.ExtraStore.Add(certSubCa);
-            var chainIsValid = chain.Build(certSubject);
+            var chainIsValid = this.ValidateChain(certSubject, certSubCa, certCa);
 
             var basicConstraintCa = certCa.Extensions.Cast<X509Extension>().Where(ext => ext.Oid.FriendlyName == "Basic Constraints").FirstOrDefault() as X509BasicConstraintsExtension;
             var basicConstraintSubCa = certSubCa.Extensions.Cast<X509Extension>().Where(ext => ext.Oid.FriendlyName == "Basic Constraints").FirstOrDefault() as X509BasicConstraintsExtension;
@@ -213,12 +218,7 @@
             var certSubCa = subca.Generate(certCa);
             var certSubject = subject.Generate(certSubCa);
 
-            var chain = new X509Chain();
-            chain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
-            chain.ChainPolicy.VerificationFlags = X509VerificationFlags.AllowUnknownCertificateAuthority;
-            chain.ChainPolicy.ExtraStore.Add(certCa);
-            chain.ChainPolicy.ExtraStore.Add(certSubCa);
-            var chainIsValid = chain.Build(certSubject);
+            var chainIsValid = this.ValidateChain(certSubject, certSubCa, certCa);
 
             var basicConstraintCa = certCa.Extensions.Cast<X509Extension>().Where(ext => ext.Oid.FriendlyName == "Basic Constraints").FirstOrDefault() as X509BasicConstraintsExtension;
             var basicConstraintSubCa = certSubCa.Extensions.Cast<X509Extension>().Where(ext => ext.Oid.FriendlyName == "Basic Constraints").FirstOrDefault() as X509BasicConstraintsExtension;
@@ -228,6 +228,20 @@
             Assert.IsTrue(basicConstraintCa.CertificateAuthority);
             Assert.IsTrue(basicConstraintSubCa.CertificateAuthority);
             Assert.IsFalse(basicConstraintSubject.CertificateAuthority);
+        }
+
+        private bool ValidateChain(X509Certificate2 subscriberCert, params X509Certificate2[] issuingCerts)
+        {
+            var chain = new X509Chain();
+            chain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
+            chain.ChainPolicy.VerificationFlags = X509VerificationFlags.AllowUnknownCertificateAuthority;
+            foreach (var cert in issuingCerts)
+            {
+                chain.ChainPolicy.ExtraStore.Add(cert);
+            }
+
+            var chainIsValid = chain.Build(subscriberCert);
+            return chainIsValid;
         }
     }
 }
