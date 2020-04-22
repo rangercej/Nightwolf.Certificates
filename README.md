@@ -1,4 +1,4 @@
-# CertificateGenerator
+# CertificateGenerator ![.NET Core](https://github.com/rangercej/Nightwolf.Certificates/workflows/.NET%20Core/badge.svg)
 
 This project contains two parts:
 
@@ -11,8 +11,7 @@ This project contains two parts:
 System.Security.Cryptography.X509Certificates.CertificateRequest is a new
 object in .NET 4.7.2 and .Net Core 2.0.
 
-The solution was developed with Visual Studio 2017 Community Edition. Testing
-a build with .NET Core is planned but not yet complete.
+The solution was developed with Visual Studio 2019 Community Edition. The solution is multi-targetting on Windows for .NET Core 3.1 and .NET 4.7.2. On Linux it's only been built and tested with .NET Core 3.1 only, but there's a strong chance the .NET 4.7.2 build will work with Mono.
 
 ## Using
 
