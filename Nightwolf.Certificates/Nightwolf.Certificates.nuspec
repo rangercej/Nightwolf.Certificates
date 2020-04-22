@@ -8,16 +8,19 @@
     <owners>Chris Johnson</owners>
     <projectUrl>https://github.com/rangercej/CertificateGenerator</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">LGPL-3.0-only</license>
     <description>Wrapper to ease the pain of creating X.509 certificates</description>
-    <releaseNotes>Initial release.</releaseNotes>
-    <copyright>Copyright 2019</copyright>
+    <copyright>Copyright 2020</copyright>
     <tags>X509 X609 DER Certificates</tags>
     <dependencies>
       <group targetFramework=".NETFramework4.7.2" />
+      <group targetFramework=".NETCoreApp3.1" />
     </dependencies>
   </metadata>
   <files>
-    <file src="bin\$configuration$\Nightwolf.DerEncoder.dll" target="lib\net472" />
-    <file src="bin\$configuration$\Nightwolf.Certificates.dll" target="lib\net472" />
-  </files>
+    <file src="bin\$configuration$\net472\Nightwolf.DerEncoder.dll" target="lib\net472" />
+    <file src="bin\$configuration$\net472\Nightwolf.Certificates.dll" target="lib\net472" />
+    <file src="bin\$configuration$\netcoreapp3.1\Nightwolf.DerEncoder.dll" target="lib\netcoreapp3.1" />
+    <file src="bin\$configuration$\netcoreapp3.1\Nightwolf.Certificates.dll" target="lib\netcoreapp3.1" />
+ </files>
 </package>
