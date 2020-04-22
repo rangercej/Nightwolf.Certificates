@@ -1,15 +1,13 @@
-﻿using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using Nightwolf.DerEncoder;
-
-namespace Nightwolf.Scratch
+﻿namespace Nightwolf.Scratch
 {
     using System;
+    using System.Diagnostics;
+    using System.Linq;
     using System.Security.Cryptography;
     using System.Security.Cryptography.X509Certificates;
 
     using Nightwolf.Certificates;
+    using Nightwolf.DerEncoder;
 
     public class Program
     {
@@ -46,8 +44,8 @@ namespace Nightwolf.Scratch
             subgen.SetValidityPeriod(new DateTime(2000, 1, 1), new DateTime(2010, 1, 1));
             var subcert = subgen.Generate(cert);
 
-            var rootca = Factories.CreateCaTemplate("CN=Nightfox Test CA", new DateTime(2000, 1, 1), new DateTime(2020, 1, 1));
-            var subca = Factories.CreateSubCaTemplate("CN=Nightfox Test SubCA",
+            var rootca = Certificates.Factories.CabForum.CreateCaTemplate("CN=Nightfox Test CA", new DateTime(2000, 1, 1), new DateTime(2020, 1, 1));
+            var subca = Certificates.Factories.CabForum.CreateSubCaTemplate("CN=Nightfox Test SubCA",
                 new DateTime(2000, 1, 1), 
                 new DateTime(2020, 1, 1),
                 new Uri("http://www.nightfox.org.uk/crls"),

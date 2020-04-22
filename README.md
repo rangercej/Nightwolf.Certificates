@@ -21,12 +21,19 @@ There are two ways of using this:
 
 ### Factory Methods (Nightwolf.Certificates.Factories)
 
-There are three methods that are intended to create CAB-compliant certificates.
-The CAB is the CA-Browser Forum, and are the body that define the requirements
-for root, intermediate, and subscriber certificates that are used on the
-public internet.
+There are two classes that each contain three methods that are intended to 
+create certificate templates for root, intermediate and subscriber certificates.
 
-The methods available are:
+One class, CabForum, endevours to create certificate templates that align to 
+CAB forum certificate requirements. The CAB is the CA-Browser Forum, and are the 
+body that define the requirements for all certificates that are used on the public 
+internet.
+
+The other class, Basic, creates a minimum-specified certificate for each of root,
+intermediate and subscriber. As a result, the methods ask for the minimum information
+required for each certificate type.
+
+The methods available in both are:
 * `CreateCaTemplate` - creates a certificate template for a root CA certificate
 * `CreateSubCaTemplate` - creates a certificate template for a sub-CA certificate
 * `CreateSubscriberTemplate` - creates the end-user subscriber certificate

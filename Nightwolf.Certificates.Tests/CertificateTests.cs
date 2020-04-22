@@ -1,6 +1,7 @@
 ﻿namespace Nightwolf.Certificates.Tests
 {
     using System;
+    using System.Linq;
     using System.Security.Cryptography;
     using System.Security.Cryptography.X509Certificates;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -167,6 +168,66 @@
             Assert.IsTrue(subject.Issuer == rootCert.Subject);
             Assert.IsTrue(subject.PublicKey.Oid.Value == NamedOids.IdEcPublicKey.Value);
             Assert.IsTrue(subject.GetECDsaPublicKey().KeySize == 521);
+        }
+
+        [TestMethod]
+        public void GenericFactory()
+        {
+            var startDate = DateTime.Now;
+            var endDate = startDate.AddDays(1);
+            var ca = Factories.Basic.CreateCaTemplate("CN=Test Root", startDate, endDate);
+            var subca = Factories.Basic.CreateSubCaTemplate("CN=Test SubCA", startDate, endDate);
+            var subject = Factories.Basic.CreateSubscriberTemplate("CN=Test Subject", startDate, endDate, new[] { ExtendedKeyUses.ClientAuth, ExtendedKeyUses.ServerAuth });
+
+            var certCa = ca.Generate();
+            var certSubCa = subca.Generate(certCa);
+            var certSubject = subject.Generate(certSubCa);
+
+            var chain = new X509Chain();
+            chain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
+            chain.ChainPolicy.VerificationFlags = X509VerificationFlags.AllowUnknownCertificateAuthority;
+            chain.ChainPolicy.ExtraStore.Add(certCa);
+            chain.ChainPolicy.ExtraStore.Add(certSubCa);
+            var chainIsValid = chain.Build(certSubject);
+
+            var basicConstraintCa = certCa.Extensions.Cast<X509Extension>().Where(ext => ext.Oid.FriendlyName == "Basic Constraints").FirstOrDefault() as X509BasicConstraintsExtension;
+            var basicConstraintSubCa = certSubCa.Extensions.Cast<X509Extension>().Where(ext => ext.Oid.FriendlyName == "Basic Constraints").FirstOrDefault() as X509BasicConstraintsExtension;
+            var basicConstraintSubject = certSubject.Extensions.Cast<X509Extension>().Where(ext => ext.Oid.FriendlyName == "Basic Constraints").FirstOrDefault() as X509BasicConstraintsExtension;
+
+            Assert.IsTrue(chainIsValid);
+            Assert.IsTrue(basicConstraintCa.CertificateAuthority);
+            Assert.IsTrue(basicConstraintSubCa.CertificateAuthority);
+            Assert.IsFalse(basicConstraintSubject.CertificateAuthority);
+        }
+
+        [TestMethod]
+        public void CabForumFactory()
+        {
+            var startDate = DateTime.Now;
+            var endDate = startDate.AddDays(1);
+            var ca = Factories.CabForum.CreateCaTemplate("CN=Test Root", startDate, endDate);
+            var subca = Factories.CabForum.CreateSubCaTemplate("CN=Test SubCA", startDate, endDate, new Uri("http://localhost/invalid"), "Test CA", new Uri("http://localhost/invalid"));
+            var subject = Factories.CabForum.CreateSubscriberTemplate("CN=Test Subject", startDate, endDate, new Uri("http://localhost/invalid"), "Test CA", new Uri("http://localhost/invalid"));
+
+            var certCa = ca.Generate();
+            var certSubCa = subca.Generate(certCa);
+            var certSubject = subject.Generate(certSubCa);
+
+            var chain = new X509Chain();
+            chain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
+            chain.ChainPolicy.VerificationFlags = X509VerificationFlags.AllowUnknownCertificateAuthority;
+            chain.ChainPolicy.ExtraStore.Add(certCa);
+            chain.ChainPolicy.ExtraStore.Add(certSubCa);
+            var chainIsValid = chain.Build(certSubject);
+
+            var basicConstraintCa = certCa.Extensions.Cast<X509Extension>().Where(ext => ext.Oid.FriendlyName == "Basic Constraints").FirstOrDefault() as X509BasicConstraintsExtension;
+            var basicConstraintSubCa = certSubCa.Extensions.Cast<X509Extension>().Where(ext => ext.Oid.FriendlyName == "Basic Constraints").FirstOrDefault() as X509BasicConstraintsExtension;
+            var basicConstraintSubject = certSubject.Extensions.Cast<X509Extension>().Where(ext => ext.Oid.FriendlyName == "Basic Constraints").FirstOrDefault() as X509BasicConstraintsExtension;
+
+            Assert.IsTrue(chainIsValid);
+            Assert.IsTrue(basicConstraintCa.CertificateAuthority);
+            Assert.IsTrue(basicConstraintSubCa.CertificateAuthority);
+            Assert.IsFalse(basicConstraintSubject.CertificateAuthority);
         }
     }
 }
