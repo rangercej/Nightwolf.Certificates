@@ -195,9 +195,9 @@
 
             var chainIsValid = this.ValidateChain(certSubject, certSubCa, certCa);
 
-            var basicConstraintCa = certCa.Extensions.Cast<X509Extension>().Where(ext => ext.Oid.FriendlyName == "Basic Constraints").FirstOrDefault() as X509BasicConstraintsExtension;
-            var basicConstraintSubCa = certSubCa.Extensions.Cast<X509Extension>().Where(ext => ext.Oid.FriendlyName == "Basic Constraints").FirstOrDefault() as X509BasicConstraintsExtension;
-            var basicConstraintSubject = certSubject.Extensions.Cast<X509Extension>().Where(ext => ext.Oid.FriendlyName == "Basic Constraints").FirstOrDefault() as X509BasicConstraintsExtension;
+            var basicConstraintCa = certCa.Extensions.Cast<X509Extension>().Where(ext => ext.Oid.Value == NamedOids.IdCeBasicConstraints.Value).FirstOrDefault() as X509BasicConstraintsExtension;
+            var basicConstraintSubCa = certSubCa.Extensions.Cast<X509Extension>().Where(ext => ext.Oid.Value == NamedOids.IdCeBasicConstraints.Value).FirstOrDefault() as X509BasicConstraintsExtension;
+            var basicConstraintSubject = certSubject.Extensions.Cast<X509Extension>().Where(ext => ext.Oid.Value == NamedOids.IdCeBasicConstraints.Value).FirstOrDefault() as X509BasicConstraintsExtension;
 
             Assert.IsTrue(chainIsValid);
             Assert.IsTrue(basicConstraintCa.CertificateAuthority);
@@ -220,9 +220,9 @@
 
             var chainIsValid = this.ValidateChain(certSubject, certSubCa, certCa);
 
-            var basicConstraintCa = certCa.Extensions.Cast<X509Extension>().Where(ext => ext.Oid.FriendlyName == "Basic Constraints").FirstOrDefault() as X509BasicConstraintsExtension;
-            var basicConstraintSubCa = certSubCa.Extensions.Cast<X509Extension>().Where(ext => ext.Oid.FriendlyName == "Basic Constraints").FirstOrDefault() as X509BasicConstraintsExtension;
-            var basicConstraintSubject = certSubject.Extensions.Cast<X509Extension>().Where(ext => ext.Oid.FriendlyName == "Basic Constraints").FirstOrDefault() as X509BasicConstraintsExtension;
+            var basicConstraintCa = certCa.Extensions.Cast<X509Extension>().Where(ext => ext.Oid.Value == NamedOids.IdCeBasicConstraints.Value).FirstOrDefault() as X509BasicConstraintsExtension;
+            var basicConstraintSubCa = certSubCa.Extensions.Cast<X509Extension>().Where(ext => ext.Oid.Value == NamedOids.IdCeBasicConstraints.Value).FirstOrDefault() as X509BasicConstraintsExtension;
+            var basicConstraintSubject = certSubject.Extensions.Cast<X509Extension>().Where(ext => ext.Oid.Value == NamedOids.IdCeBasicConstraints.Value).FirstOrDefault() as X509BasicConstraintsExtension;
 
             Assert.IsTrue(chainIsValid);
             Assert.IsTrue(basicConstraintCa.CertificateAuthority);

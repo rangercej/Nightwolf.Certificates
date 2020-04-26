@@ -18,6 +18,7 @@
         public static readonly Oid IdPeAuthorityInfoAccess = ConstructOid(IdPe, "1");
 
         public static readonly Oid IdCe = ConstructOid("2.5.29");
+        public static readonly Oid IdCeBasicConstraints = ConstructOid(IdCe, "19");
         public static readonly Oid IdCeCrlDistributionPoints = ConstructOid(IdCe, "31");
         public static readonly Oid IdCeCertificatePolicies = ConstructOid(IdCe, "32");
         public static readonly Oid IdCeExtKeyUsage = ConstructOid(IdCe, "37");
