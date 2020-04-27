@@ -203,7 +203,7 @@
             if (!string.IsNullOrWhiteSpace(certPolicyStatement))
             {
                 policyText = new X690Sequence(
-                    new X690Oid(NamedOids.IdQtUnotice),
+                    new X690Oid(NamedOids.PolicyQualifiers.IdQtUnotice),
                     new X690Sequence(
                         new X690Utf8String(certPolicyStatement)
                     )
@@ -213,7 +213,7 @@
             if (certPolicyUrl != null)
             {
                 policyUrl = new X690Sequence(
-                    new X690Oid(NamedOids.IdQtCps),
+                    new X690Oid(NamedOids.PolicyQualifiers.IdQtCps),
                     new X690Ia5String(certPolicyUrl.AbsoluteUri)
                 );
             }
@@ -237,20 +237,20 @@
             if (policyStatement == null)
             {
                 policy.Add(new X690Sequence(
-                        new X690Oid(NamedOids.AnyPolicy)
+                        new X690Oid(NamedOids.CertificatePolicies.AnyPolicy)
                     )
                 );
             }
             else
             {
                 policy.Add(new X690Sequence(
-                        new X690Oid(NamedOids.AnyPolicy),
+                        new X690Oid(NamedOids.CertificatePolicies.AnyPolicy),
                         policyStatement
                     )
                 );
             }
 
-            var extension = new X509Extension(NamedOids.IdCeCertificatePolicies, policy.GetBytes(), critical);
+            var extension = new X509Extension(NamedOids.CertificatePolicies.IdCeCertificatePolicies, policy.GetBytes(), critical);
             this.SetExtension(extension);
         }
 
@@ -262,7 +262,7 @@
         public void SetComment(string comment, bool critical = false)
         {
             var asnBytes = new Nightwolf.DerEncoder.X690Utf8String(comment).GetBytes();
-            var extension = new X509Extension(NamedOids.NsComment, asnBytes, critical);
+            var extension = new X509Extension(NamedOids.NonStandard.NsComment, asnBytes, critical);
             this.SetExtension(extension);
         }
 
@@ -283,7 +283,7 @@
                 )
             );
 
-            var extension = new X509Extension(NamedOids.IdCeCrlDistributionPoints, data.GetBytes(), critical);
+            var extension = new X509Extension(NamedOids.CertificateExtensions.IdCeCrlDistributionPoints, data.GetBytes(), critical);
             this.SetExtension(extension);
         }
 
@@ -296,12 +296,12 @@
         {
             var data = new X690Sequence(
                 new X690Sequence(
-                    new X690Oid(NamedOids.IdAdOcsp),
+                    new X690Oid(NamedOids.AccessDescriptors.IdAdOcsp),
                     new Rfc5280GeneralName(ocspEndpoint)
                 )
             );
 
-            var extension = new X509Extension(NamedOids.IdPeAuthorityInfoAccess, data.GetBytes(), critical);
+            var extension = new X509Extension(NamedOids.InformationAccess.IdPeAuthorityInfoAccess, data.GetBytes(), critical);
             this.SetExtension(extension);
         }
 
@@ -476,12 +476,12 @@
         /// <returns>Signature generator for the certificate</returns>
         private X509SignatureGenerator GetGeneratorForCertificate(X509Certificate2 issuer)
         {
-            if (issuer.PublicKey.Oid.Value == NamedOids.IdEcPublicKey.Value)
+            if (issuer.PublicKey.Oid.Value == NamedOids.KeyAlgorithm.IdEcPublicKey.Value)
             {
                 var key = issuer.GetECDsaPrivateKey();
                 return X509SignatureGenerator.CreateForECDsa(key);
             }
-            else if (issuer.PublicKey.Oid.Value == NamedOids.RsaEncryption.Value)
+            else if (issuer.PublicKey.Oid.Value == NamedOids.KeyAlgorithm.RsaEncryption.Value)
             {
                 var key = issuer.GetRSAPrivateKey();
                 return X509SignatureGenerator.CreateForRSA(key, RSASignaturePadding.Pkcs1);

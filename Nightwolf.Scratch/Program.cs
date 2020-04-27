@@ -20,8 +20,8 @@
             //gen.SetCertAsCa();
             //gen.SetCertAsCa();
             gen.AddSubjectAltName("E=bob@example.org");
-            gen.AddExtendedUsage(ExtendedKeyUses.ClientAuth);
-            gen.AddExtendedUsage(ExtendedKeyUses.SmartcardLogin);
+            gen.AddExtendedUsage(NamedOids.CertificateUses.IdKpClientAuth);
+            gen.AddExtendedUsage(NamedOids.Microsoft.XcnOidKpSmartcardLogon);
             gen.SetCustomValue(new Oid("1.2.3.4.5.6.7.8.9.10"), DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
             gen.SetCustomValue(new Oid("1.2.3.4.5.6.7.8.9.11"), "This is a really long string that's more than 127 characters long. We do this to test that the length code is doing the right thing, which it may or may not be doing. I need it to be at least 256 characters long to check the two byte length indicator in byte 1. Hopefully, this will work correctly.");
             gen.SetCustomValue(new Oid("1.2.3.4.5.6.7.8.9.12"), -34);

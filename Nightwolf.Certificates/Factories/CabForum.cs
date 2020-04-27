@@ -69,12 +69,12 @@
             builder.SetCrlDistributionPoint(crlDistributionPoint);
             builder.SetCertificatePolicy(certPolicyStatement, certPolicyUrl);
             builder.SetAuthorityInformationAccess(crlDistributionPoint);
-            builder.AddExtendedUsage(ExtendedKeyUses.ClientAuth);
-            builder.AddExtendedUsage(ExtendedKeyUses.ServerAuth);
+            builder.AddExtendedUsage(NamedOids.CertificateUses.IdKpClientAuth);
+            builder.AddExtendedUsage(NamedOids.CertificateUses.IdKpServerAuth);
 
             if (keyUsages != null)
             {
-                foreach (var oiduse in keyUsages.Where(x => x.Value != ExtendedKeyUses.ServerAuth.Value && x.Value != ExtendedKeyUses.ClientAuth.Value))
+                foreach (var oiduse in keyUsages.Where(x => x.Value != NamedOids.CertificateUses.IdKpServerAuth.Value && x.Value != NamedOids.CertificateUses.IdKpClientAuth.Value))
                 {
                     builder.AddExtendedUsage(oiduse);
                 }
@@ -113,12 +113,12 @@
 
             builder.SetCertificatePolicy(certPolicyStatement, certPolicyUrl);
             builder.SetAuthorityInformationAccess(crlDistributionPoint);
-            builder.AddExtendedUsage(ExtendedKeyUses.ClientAuth);
-            builder.AddExtendedUsage(ExtendedKeyUses.ServerAuth);
+            builder.AddExtendedUsage(NamedOids.CertificateUses.IdKpClientAuth);
+            builder.AddExtendedUsage(NamedOids.CertificateUses.IdKpServerAuth);
 
             if (keyUsages != null)
             {
-                foreach (var oiduse in keyUsages.Where(x => x.Value != ExtendedKeyUses.ServerAuth.Value && x.Value != ExtendedKeyUses.ClientAuth.Value))
+                foreach (var oiduse in keyUsages.Where(x => x.Value != NamedOids.CertificateUses.IdKpServerAuth.Value && x.Value != NamedOids.CertificateUses.IdKpClientAuth.Value))
                 {
                     builder.AddExtendedUsage(oiduse);
                 }

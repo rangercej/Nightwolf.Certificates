@@ -60,7 +60,7 @@
 
             if (keyUsages != null)
             {
-                foreach (var oiduse in keyUsages.Where(x => x.Value != ExtendedKeyUses.ServerAuth.Value && x.Value != ExtendedKeyUses.ClientAuth.Value))
+                foreach (var oiduse in keyUsages)
                 {
                     builder.AddExtendedUsage(oiduse);
                 }
