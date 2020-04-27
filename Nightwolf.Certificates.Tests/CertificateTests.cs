@@ -6,9 +6,32 @@
     using System.Security.Cryptography.X509Certificates;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+    using Nightwolf.Certificates.NamedOids;
+
     [TestClass]
     public class CertificateTests
     {
+        [TestMethod]
+        public void OidExtensionMatchesOid()
+        {
+            var a = new Oid("1.2.3.4.5.6.7");
+            var b = new Oid("1.2.3.4.5.6.7");
+            var c = new Oid("1.2.3.4.5.6.7.8");
+
+            Assert.IsTrue(a.Matches(b));
+            Assert.IsFalse(a.Matches(c));
+            Assert.IsFalse(b.Matches(c));
+        }
+
+        [TestMethod]
+        public void OidExtensionMatchesString()
+        {
+            var a = new Oid("1.2.3.4.5.6.7");
+
+            Assert.IsTrue(a.Matches("1.2.3.4.5.6.7"));
+            Assert.IsFalse(a.Matches("1.2.3.4.5.6.7.8"));
+        }
+
         [TestMethod]
         public void SelfsignedCert()
         {
@@ -68,7 +91,7 @@
             Assert.IsTrue(rootCert.NotAfter == endDate);
             Assert.IsTrue(rootCert.HasPrivateKey);
             Assert.IsTrue(rootCert.Issuer == rootCert.Subject);
-            Assert.IsTrue(rootCert.PublicKey.Oid.Value == NamedOids.KeyAlgorithm.RsaEncryption.Value);
+            Assert.IsTrue(rootCert.PublicKey.Oid.Matches(KeyAlgorithm.RsaEncryption));
             Assert.IsTrue(((RSA)rootCert.PublicKey.Key).KeySize == 2048);
 
             var subjectCert = new Generator("CN=Test subject", 4096, HashAlgorithmName.SHA512);
@@ -81,7 +104,7 @@
             Assert.IsTrue(subject.NotBefore == startDate);
             Assert.IsTrue(subject.NotAfter == endDate);
             Assert.IsTrue(subject.HasPrivateKey);
-            Assert.IsTrue(subject.PublicKey.Oid.Value == NamedOids.KeyAlgorithm.RsaEncryption.Value);
+            Assert.IsTrue(subject.PublicKey.Oid.Matches(KeyAlgorithm.RsaEncryption));
             Assert.IsTrue(((RSA)subject.PublicKey.Key).KeySize == 4096);
         }
         [TestMethod]
@@ -98,7 +121,7 @@
             Assert.IsTrue(rootCert.NotBefore == startDate);
             Assert.IsTrue(rootCert.NotAfter == endDate);
             Assert.IsTrue(rootCert.HasPrivateKey);
-            Assert.IsTrue(rootCert.PublicKey.Oid.Value == NamedOids.KeyAlgorithm.IdEcPublicKey.Value);
+            Assert.IsTrue(rootCert.PublicKey.Oid.Matches(KeyAlgorithm.IdEcPublicKey));
             Assert.IsTrue(rootCert.GetECDsaPublicKey().KeySize == 384);
             Assert.IsTrue(rootCert.Issuer == rootCert.Subject);
 
@@ -112,7 +135,7 @@
             Assert.IsTrue(subject.NotBefore == startDate);
             Assert.IsTrue(subject.NotAfter == endDate);
             Assert.IsTrue(subject.HasPrivateKey);
-            Assert.IsTrue(subject.PublicKey.Oid.Value == NamedOids.KeyAlgorithm.IdEcPublicKey.Value);
+            Assert.IsTrue(subject.PublicKey.Oid.Matches(KeyAlgorithm.IdEcPublicKey));
             Assert.IsTrue(subject.GetECDsaPublicKey().KeySize == 521);
         }
 
@@ -130,7 +153,7 @@
             Assert.IsTrue(rootCert.NotBefore == startDate);
             Assert.IsTrue(rootCert.NotAfter == endDate);
             Assert.IsTrue(rootCert.HasPrivateKey);
-            Assert.IsTrue(rootCert.PublicKey.Oid.Value == NamedOids.KeyAlgorithm.IdEcPublicKey.Value);
+            Assert.IsTrue(rootCert.PublicKey.Oid.Matches(KeyAlgorithm.IdEcPublicKey));
             Assert.IsTrue(rootCert.GetECDsaPublicKey().KeySize == 384);
             Assert.IsTrue(rootCert.Issuer == rootCert.Subject);
 
@@ -144,7 +167,7 @@
             Assert.IsTrue(subject.NotBefore == startDate);
             Assert.IsTrue(subject.NotAfter == endDate);
             Assert.IsTrue(subject.HasPrivateKey);
-            Assert.IsTrue(subject.PublicKey.Oid.Value == NamedOids.KeyAlgorithm.RsaEncryption.Value);
+            Assert.IsTrue(subject.PublicKey.Oid.Matches(KeyAlgorithm.RsaEncryption));
             Assert.IsTrue(subject.GetRSAPublicKey().KeySize == 4096);
         }
 
@@ -163,7 +186,7 @@
             Assert.IsTrue(rootCert.NotAfter == endDate);
             Assert.IsTrue(rootCert.HasPrivateKey);
             Assert.IsTrue(rootCert.Issuer == rootCert.Subject);
-            Assert.IsTrue(rootCert.PublicKey.Oid.Value == NamedOids.KeyAlgorithm.RsaEncryption.Value);
+            Assert.IsTrue(rootCert.PublicKey.Oid.Matches(KeyAlgorithm.RsaEncryption));
             Assert.IsTrue(rootCert.GetRSAPublicKey().KeySize == 2048);
 
             var subjectCert = new Generator("CN=Test subject", ECCurve.NamedCurves.nistP521, HashAlgorithmName.SHA512);
@@ -176,7 +199,7 @@
             Assert.IsTrue(subject.NotBefore == startDate);
             Assert.IsTrue(subject.NotAfter == endDate);
             Assert.IsTrue(subject.HasPrivateKey);
-            Assert.IsTrue(subject.PublicKey.Oid.Value == NamedOids.KeyAlgorithm.IdEcPublicKey.Value);
+            Assert.IsTrue(subject.PublicKey.Oid.Matches(KeyAlgorithm.IdEcPublicKey));
             Assert.IsTrue(subject.GetECDsaPublicKey().KeySize == 521);
         }
 
@@ -195,9 +218,9 @@
 
             var chainIsValid = this.ValidateChain(certSubject, certSubCa, certCa);
 
-            var basicConstraintCa = certCa.Extensions.Cast<X509Extension>().Where(ext => ext.Oid.Value == NamedOids.CertificateExtensions.IdCeBasicConstraints.Value).FirstOrDefault() as X509BasicConstraintsExtension;
-            var basicConstraintSubCa = certSubCa.Extensions.Cast<X509Extension>().Where(ext => ext.Oid.Value == NamedOids.CertificateExtensions.IdCeBasicConstraints.Value).FirstOrDefault() as X509BasicConstraintsExtension;
-            var basicConstraintSubject = certSubject.Extensions.Cast<X509Extension>().Where(ext => ext.Oid.Value == NamedOids.CertificateExtensions.IdCeBasicConstraints.Value).FirstOrDefault() as X509BasicConstraintsExtension;
+            var basicConstraintCa = certCa.Extensions.Cast<X509Extension>().Where(ext => ext.Oid.Matches(CertificateExtensions.IdCeBasicConstraints)).FirstOrDefault() as X509BasicConstraintsExtension;
+            var basicConstraintSubCa = certSubCa.Extensions.Cast<X509Extension>().Where(ext => ext.Oid.Matches(CertificateExtensions.IdCeBasicConstraints)).FirstOrDefault() as X509BasicConstraintsExtension;
+            var basicConstraintSubject = certSubject.Extensions.Cast<X509Extension>().Where(ext => ext.Oid.Matches(CertificateExtensions.IdCeBasicConstraints)).FirstOrDefault() as X509BasicConstraintsExtension;
 
             Assert.IsTrue(chainIsValid);
             Assert.IsTrue(basicConstraintCa.CertificateAuthority);
@@ -220,9 +243,9 @@
 
             var chainIsValid = this.ValidateChain(certSubject, certSubCa, certCa);
 
-            var basicConstraintCa = certCa.Extensions.Cast<X509Extension>().Where(ext => ext.Oid.Value == NamedOids.CertificateExtensions.IdCeBasicConstraints.Value).FirstOrDefault() as X509BasicConstraintsExtension;
-            var basicConstraintSubCa = certSubCa.Extensions.Cast<X509Extension>().Where(ext => ext.Oid.Value == NamedOids.CertificateExtensions.IdCeBasicConstraints.Value).FirstOrDefault() as X509BasicConstraintsExtension;
-            var basicConstraintSubject = certSubject.Extensions.Cast<X509Extension>().Where(ext => ext.Oid.Value == NamedOids.CertificateExtensions.IdCeBasicConstraints.Value).FirstOrDefault() as X509BasicConstraintsExtension;
+            var basicConstraintCa = certCa.Extensions.Cast<X509Extension>().Where(ext => ext.Oid.Matches(CertificateExtensions.IdCeBasicConstraints)).FirstOrDefault() as X509BasicConstraintsExtension;
+            var basicConstraintSubCa = certSubCa.Extensions.Cast<X509Extension>().Where(ext => ext.Oid.Matches(CertificateExtensions.IdCeBasicConstraints)).FirstOrDefault() as X509BasicConstraintsExtension;
+            var basicConstraintSubject = certSubject.Extensions.Cast<X509Extension>().Where(ext => ext.Oid.Matches(CertificateExtensions.IdCeBasicConstraints)).FirstOrDefault() as X509BasicConstraintsExtension;
 
             Assert.IsTrue(chainIsValid);
             Assert.IsTrue(basicConstraintCa.CertificateAuthority);

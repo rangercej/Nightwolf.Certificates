@@ -6,6 +6,8 @@
     using System.Security.Cryptography;
     using System.Security.Cryptography.X509Certificates;
 
+    using Nightwolf.Certificates.NamedOids;
+
     /// <summary>
     /// Certificate static factory methods to quickly build certificates
     /// </summary>
@@ -69,12 +71,12 @@
             builder.SetCrlDistributionPoint(crlDistributionPoint);
             builder.SetCertificatePolicy(certPolicyStatement, certPolicyUrl);
             builder.SetAuthorityInformationAccess(crlDistributionPoint);
-            builder.AddExtendedUsage(NamedOids.CertificateUses.IdKpClientAuth);
-            builder.AddExtendedUsage(NamedOids.CertificateUses.IdKpServerAuth);
+            builder.AddExtendedUsage(CertificateUses.IdKpClientAuth);
+            builder.AddExtendedUsage(CertificateUses.IdKpServerAuth);
 
             if (keyUsages != null)
             {
-                foreach (var oiduse in keyUsages.Where(x => x.Value != NamedOids.CertificateUses.IdKpServerAuth.Value && x.Value != NamedOids.CertificateUses.IdKpClientAuth.Value))
+                foreach (var oiduse in keyUsages.Where(x => x.Value != CertificateUses.IdKpServerAuth.Value && x.Value != CertificateUses.IdKpClientAuth.Value))
                 {
                     builder.AddExtendedUsage(oiduse);
                 }
@@ -113,12 +115,12 @@
 
             builder.SetCertificatePolicy(certPolicyStatement, certPolicyUrl);
             builder.SetAuthorityInformationAccess(crlDistributionPoint);
-            builder.AddExtendedUsage(NamedOids.CertificateUses.IdKpClientAuth);
-            builder.AddExtendedUsage(NamedOids.CertificateUses.IdKpServerAuth);
+            builder.AddExtendedUsage(CertificateUses.IdKpClientAuth);
+            builder.AddExtendedUsage(CertificateUses.IdKpServerAuth);
 
             if (keyUsages != null)
             {
-                foreach (var oiduse in keyUsages.Where(x => x.Value != NamedOids.CertificateUses.IdKpServerAuth.Value && x.Value != NamedOids.CertificateUses.IdKpClientAuth.Value))
+                foreach (var oiduse in keyUsages.Where(x => x.Value != CertificateUses.IdKpServerAuth.Value && x.Value != CertificateUses.IdKpClientAuth.Value))
                 {
                     builder.AddExtendedUsage(oiduse);
                 }
